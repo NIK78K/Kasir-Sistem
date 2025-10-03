@@ -25,6 +25,9 @@
         <label>Harga:</label><br>
         <input type="number" name="harga" value="{{ old('harga', $barang->harga) }}"><br><br>
 
+        <label>Stok:</label><br>
+        <input type="number" name="stok" value="{{ old('stok', $barang->stok) }}"><br><br>
+
         <button type="submit">Update</button>
     </form>
 

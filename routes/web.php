@@ -27,6 +27,10 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::resource('customer', CustomerController::class);
     Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::post('transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
+    Route::post('transaksi/add-to-cart', [TransaksiController::class, 'addToCart'])->name('transaksi.addToCart');
+    Route::post('transaksi/confirm-order', [TransaksiController::class, 'confirmOrder'])->name('transaksi.confirmOrder');
+    Route::get('transaksi/confirm', [TransaksiController::class, 'confirm'])->name('transaksi.confirm');
+    Route::get('transaksi/export-pdf', [TransaksiController::class, 'exportPdf'])->name('transaksi.exportPdf');
     Route::get('transaksi/batal', function () {
         return redirect()->route('transaksi.listBatal');
     });
@@ -35,7 +39,6 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::get('barang-return', [TransaksiController::class, 'listReturnableTransaksi'])->name('transaksi.listReturnable');
     Route::get('barang-return/{id}', [TransaksiController::class, 'barangReturn'])->name('transaksi.barangReturn');
     Route::post('barang-return/{id}', [TransaksiController::class, 'return'])->name('transaksi.return');
-    Route::resource('barang', BarangController::class)->middleware(['auth', 'role:kasir']);
 });
 
 Route::middleware(['auth', 'role:owner'])->group(function () {

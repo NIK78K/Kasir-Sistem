@@ -7,19 +7,144 @@ use App\Models\Barang;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $barangs = Barang::all();
         $customers = Customer::all();
-        $transaksis = Transaksi::with('barang', 'customer')
-            ->where('status', 'selesai') // hanya transaksi aktif
-            ->latest()
-            ->paginate(10);
+        $customer = null;
+        $searchResults = collect();
+        $cart = session('cart', []);
 
-        return view('transaksi.index', compact('barangs', 'customers', 'transaksis'));
+        if ($request->filled('customer_id')) {
+            $customer = Customer::find($request->customer_id);
+        }
+
+        if ($request->filled('search_barang')) {
+            $searchResults = Barang::where('nama_barang', 'like', '%' . $request->search_barang . '%')->get();
+        }
+
+        return view('transaksi.index', compact('customers', 'customer', 'searchResults', 'cart'));
+    }
+
+    public function addToCart(Request $request)
+    {
+        $request->validate([
+            'barang_id' => 'required|exists:barangs,id',
+            'jumlah' => 'required|integer|min:1',
+            'tipe_harga' => 'required|in:biasa,grosir',
+        ]);
+
+        $barang = Barang::findOrFail($request->barang_id);
+
+        $cart = session('cart', []);
+
+        // Determine harga based on tipe_harga
+        $harga = $request->tipe_harga === 'grosir' ? $barang->harga_grosir : $barang->harga;
+
+        // Check if barang with same tipe_harga already in cart
+        $found = false;
+        foreach ($cart as &$item) {
+            if ($item['barang_id'] == $barang->id && $item['tipe_harga'] == $request->tipe_harga) {
+                $item['jumlah'] += $request->jumlah;
+                $found = true;
+                break;
+            }
+        }
+        if (!$found) {
+            $cart[] = [
+                'barang_id' => $barang->id,
+                'nama_barang' => $barang->nama_barang,
+                'harga' => $harga,
+                'tipe_harga' => $request->tipe_harga,
+                'jumlah' => $request->jumlah,
+            ];
+        }
+
+        session(['cart' => $cart]);
+
+        return redirect()->route('transaksi.index')->with('success', 'Barang berhasil ditambahkan ke daftar belanja');
+    }
+
+    public function confirmOrder(Request $request)
+    {
+        $request->validate([
+            'customer_id' => 'required|exists:customers,id',
+            'tipe_pembayaran' => 'required|string',
+        ]);
+
+        $cart = session('cart', []);
+        if (empty($cart)) {
+            return redirect()->route('transaksi.index')->withErrors(['cart' => 'Daftar belanja kosong']);
+        }
+
+        $customer = Customer::findOrFail($request->customer_id);
+
+        $orderIds = [];
+        DB::transaction(function () use ($cart, $customer, $request, &$orderIds) {
+            foreach ($cart as $item) {
+                $barang = Barang::findOrFail($item['barang_id']);
+                if ($barang->stok < $item['jumlah']) {
+                    throw new \Exception("Stok barang {$barang->nama_barang} tidak cukup");
+                }
+
+                $total_harga = $item['harga'] * $item['jumlah'];
+
+                $transaksi = Transaksi::create([
+                    'customer_id' => $customer->id,
+                    'barang_id' => $barang->id,
+                    'jumlah' => $item['jumlah'],
+                    'harga_barang' => $item['harga'],
+                    'diskon' => 0,
+                    'total_harga' => $total_harga,
+                    'tanggal_pembelian' => now(),
+                    'tipe_pembayaran' => $request->tipe_pembayaran,
+                    'alamat_pengantaran' => $customer->alamat,
+                    'status' => 'selesai',
+                ]);
+
+                $orderIds[] = $transaksi->id;
+
+                $barang->decrement('stok', $item['jumlah']);
+            }
+        });
+
+        session(['last_order_ids' => $orderIds]);
+        session()->forget('cart');
+
+        return redirect()->route('transaksi.confirm')->with('success', 'Pesanan berhasil dikonfirmasi');
+    }
+
+    public function confirm()
+    {
+        $orderIds = session('last_order_ids', []);
+        if (empty($orderIds)) {
+            return redirect()->route('transaksi.index')->withErrors('Tidak ada pesanan untuk dikonfirmasi');
+        }
+
+        $transaksis = Transaksi::with('barang', 'customer')->whereIn('id', $orderIds)->get();
+        $customer = $transaksis->first()->customer ?? null;
+        $total = $transaksis->sum('total_harga');
+
+        return view('transaksi.confirm', compact('transaksis', 'customer', 'total'));
+    }
+
+    public function exportPdf()
+    {
+        $orderIds = session('last_order_ids', []);
+        if (empty($orderIds)) {
+            return redirect()->route('transaksi.index')->withErrors('Tidak ada pesanan untuk diekspor');
+        }
+
+        $transaksis = Transaksi::with('barang', 'customer')->whereIn('id', $orderIds)->get();
+        $customer = $transaksis->first()->customer ?? null;
+        $total = $transaksis->sum('total_harga');
+
+        $pdf = Pdf::loadView('transaksi.nota_pdf', compact('transaksis', 'customer', 'total'));
+
+        return $pdf->download('nota_pembelian.pdf');
     }
 
     public function listReturnableTransaksi()
@@ -163,3 +288,4 @@ class TransaksiController extends Controller
         return redirect()->route('transaksi.barangReturn', ['id' => $transaksi->id])->with('success', 'Barang berhasil dikembalikan');
     }
 }
+

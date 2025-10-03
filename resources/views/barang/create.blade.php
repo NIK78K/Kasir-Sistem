@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('barang.store') }}" method="POST" class="max-w-md">
+    <form action="{{ route('barang.store') }}" method="POST" class="max-w-md" enctype="multipart/form-data">
         @csrf
         <div class="mb-4">
             <label class="block text-gray-700 font-semibold mb-2" for="nama_barang">Nama Barang:</label>
@@ -29,9 +29,31 @@
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 
+        <div class="mb-4">
+            <label class="block text-gray-700 font-semibold mb-2" for="harga_grosir">Harga Grosir:</label>
+            <input type="number" name="harga_grosir" id="harga_grosir" value="{{ old('harga_grosir') }}" 
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 font-semibold mb-2" for="kategori">Kategori:</label>
+            <select name="kategori" id="kategori" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="Elektronik" {{ old('kategori') == 'Elektronik' ? 'selected' : '' }}>Elektronik</option>
+                <option value="Pakaian" {{ old('kategori') == 'Pakaian' ? 'selected' : '' }}>Pakaian</option>
+                <option value="Makanan" {{ old('kategori') == 'Makanan' ? 'selected' : '' }}>Makanan</option>
+                <option value="Lainnya" {{ old('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+            </select>
+        </div>
+
         <div class="mb-6">
             <label class="block text-gray-700 font-semibold mb-2" for="stok">Stok Barang:</label>
             <input type="number" name="stok" id="stok" min="0" value="{{ old('stok', $barang->stok ?? 0) }}" required
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-gray-700 font-semibold mb-2" for="gambar">Unggah Gambar Barang:</label>
+            <input type="file" name="gambar" id="gambar" accept="image/*"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
 

@@ -7,9 +7,20 @@ use Illuminate\Http\Request;
 
 class BarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $barangs = Barang::all();
+        $query = Barang::query();
+
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+
+        if ($request->filled('search')) {
+            $query->where('nama_barang', 'like', '%' . $request->search . '%');
+        }
+
+        $barangs = $query->get();
+
         return view('barang.index', compact('barangs'));
     }
 
@@ -23,10 +34,20 @@ class BarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|string|max:255',
             'harga' => 'required|integer|min:0',
+            'harga_grosir' => 'nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
+            'kategori' => 'required|string|max:255',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Barang::create($request->only('nama_barang', 'harga', 'stok'));
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+
+        if ($request->hasFile('gambar')) {
+            $imagePath = $request->file('gambar')->store('barang_images', 'public');
+            $data['gambar'] = $imagePath;
+        }
+
+        Barang::create($data);
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
     }
@@ -41,10 +62,20 @@ class BarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|string|max:255',
             'harga' => 'required|integer|min:0',
+            'harga_grosir' => 'nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
+            'kategori' => 'required|string|max:255',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $barang->update($request->only('nama_barang', 'harga', 'stok'));
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+
+        if ($request->hasFile('gambar')) {
+            $imagePath = $request->file('gambar')->store('barang_images', 'public');
+            $data['gambar'] = $imagePath;
+        }
+
+        $barang->update($data);
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
     }
