@@ -35,7 +35,7 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
         return redirect()->route('transaksi.listBatal');
     });
     Route::post('transaksi/batal', [TransaksiController::class, 'batal'])->name('transaksi.batal');
-    Route::get('transaksi/batal-list', [TransaksiController::class, 'listBatal'])->name('transaksi.listBatal');
+    Route::get('transaksi/batal-list/{id?}', [TransaksiController::class, 'listBatal'])->name('transaksi.listBatal');
     Route::get('barang-return', [TransaksiController::class, 'listReturnableTransaksi'])->name('transaksi.listReturnable');
     Route::get('barang-return/{id}', [TransaksiController::class, 'barangReturn'])->name('transaksi.barangReturn');
     Route::post('barang-return/{id}', [TransaksiController::class, 'return'])->name('transaksi.return');

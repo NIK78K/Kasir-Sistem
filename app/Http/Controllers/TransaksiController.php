@@ -18,8 +18,12 @@ class TransaksiController extends Controller
         $searchResults = collect();
         $cart = session('cart', []);
 
+        // Store selected customer_id in session if provided
         if ($request->filled('customer_id')) {
+            session(['selected_customer_id' => $request->customer_id]);
             $customer = Customer::find($request->customer_id);
+        } elseif (session()->has('selected_customer_id')) {
+            $customer = Customer::find(session('selected_customer_id'));
         }
 
         if ($request->filled('search_barang')) {
@@ -65,7 +69,10 @@ class TransaksiController extends Controller
 
         session(['cart' => $cart]);
 
-        return redirect()->route('transaksi.index')->with('success', 'Barang berhasil ditambahkan ke daftar belanja');
+        // Redirect with selected_customer_id from session to keep customer selected
+        $selectedCustomerId = session('selected_customer_id', null);
+
+        return redirect()->route('transaksi.index', ['customer_id' => $selectedCustomerId])->with('success', 'Barang berhasil ditambahkan ke daftar belanja');
     }
 
     public function confirmOrder(Request $request)
@@ -210,6 +217,7 @@ class TransaksiController extends Controller
     {
         $request->validate([
             'transaksi_id' => 'required|exists:transaksis,id',
+            'confirm_batal' => 'required|accepted',
         ]);
 
         $transaksi = Transaksi::findOrFail($request->transaksi_id);
@@ -226,17 +234,26 @@ class TransaksiController extends Controller
             $transaksi->save();
         });
 
-        return redirect()->route('transaksi.index')->with('success', 'Transaksi berhasil dibatalkan dan stok dikembalikan');
+        return redirect()->route('transaksi.listBatal')->with('success', 'Transaksi berhasil dibatalkan dan stok dikembalikan');
     }
 
-    public function listBatal()
+    public function listBatal($id = null)
     {
-        $transaksis = Transaksi::with('barang', 'customer')
-            ->where('status', 'batal')
-            ->latest()
-            ->paginate(10);
+        if ($id) {
+            $transaksi = Transaksi::with('barang', 'customer')
+                ->where('id', $id)
+                ->where('status', 'selesai') // Only allow cancellation of completed transactions
+                ->firstOrFail();
 
-        return view('transaksi.batal', compact('transaksis'));
+            return view('transaksi.batal', compact('transaksi'));
+        } else {
+            $transaksis = Transaksi::with('barang', 'customer')
+                ->where('status', 'selesai') // Show completed transactions that can be canceled
+                ->latest()
+                ->paginate(10);
+
+            return view('transaksi.batal', compact('transaksis'));
+        }
     }
 
     public function barangReturn($id)
