@@ -5,91 +5,90 @@
 @section('content')
 
     @if(session('success'))
-        <div style="color:green">{{ session('success') }}</div>
+        <div class="mb-4 p-4 rounded-lg bg-green-100 text-green-700 border border-green-300 shadow">
+            {{ session('success') }}
+        </div>
     @endif
 
     @if(isset($transaksi))
-        <div style="border: 1px solid black; border-radius: 10px; padding: 20px; max-width: 600px; margin: auto;">
-            <a href="{{ route('transaksi.listBatal') }}" style="text-decoration:none; font-weight:bold;">&larr; Kembali</a>
-            <h3 style="text-align:center; margin-bottom: 20px;">Detail Transaksi</h3>
-            <div>
-                <strong>Nomor Transaksi</strong> : {{ str_pad($transaksi->id, 9, '0', STR_PAD_LEFT) }}
+        <div class="max-w-md mx-auto border border-black rounded-xl p-6 space-y-6">
+            <a href="{{ route('transaksi.listBatal') }}" class="font-bold text-black hover:underline flex items-center space-x-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Detail Transaksi</span>
+            </a>
+            <div class="space-y-2">
+                <p><strong>Nomor Transaksi</strong> : {{ str_pad($transaksi->id, 9, '0', STR_PAD_LEFT) }}</p>
+                <p><strong>Nama Customer</strong> : {{ $transaksi->customer->nama_customer }}</p>
+                <p><strong>Tipe Customer</strong> : {{ ucfirst($transaksi->customer->tipe_pembeli) ?? 'N/A' }}</p>
             </div>
             <div>
-                <strong>Nama Customer</strong> : {{ $transaksi->customer->nama_customer }}
-            </div>
-            <div>
-                <strong>Tipe Customer</strong> : {{ $transaksi->customer->tipe_customer ?? 'N/A' }}
-            </div>
-            <div style="margin-top: 20px;">
                 <strong>Daftar Belanja</strong>
-                <table style="width: 100%; margin-top: 10px; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th style="text-align:left; border-bottom: 1px solid black;">Nama Barang</th>
-                            <th style="text-align:center; border-bottom: 1px solid black;">Jumlah</th>
-                            <th style="text-align:right; border-bottom: 1px solid black;">Harga</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="font-weight:bold;">{{ $transaksi->barang->nama_barang }}</td>
-                            <td style="text-align:center;">{{ $transaksi->jumlah }}</td>
-                            <td style="text-align:right;">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="mt-2 space-y-2">
+                    <div class="flex justify-between font-semibold">
+                        <span>{{ $transaksi->barang->nama_barang }}</span>
+                        <span>{{ $transaksi->jumlah }}</span>
+                        <span>Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</span>
+                    </div>
+                </div>
             </div>
-            <form method="POST" action="{{ route('transaksi.batal') }}" style="margin-top: 30px; text-align:center;">
+            <form method="POST" action="{{ route('transaksi.batal') }}" class="space-y-4">
                 @csrf
                 <input type="hidden" name="transaksi_id" value="{{ $transaksi->id }}">
-                <label style="display: block; margin-bottom: 10px;">
-                    <input type="checkbox" name="confirm_batal" value="1" required>
-                    Konfirmasi pembatalan transaksi
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" name="confirm_batal" value="1" required class="form-checkbox h-5 w-5 text-black">
+                    <span>Konfirmasi pembatalan transaksi</span>
                 </label>
-                <button type="submit" style="padding: 10px 20px; border-radius: 20px; border: 1px solid black; background-color: white; cursor: pointer;">
+                <button type="submit" class="w-full py-2 border border-black rounded-full hover:bg-black hover:text-white transition font-semibold">
                     Batalkan Transaksi
                 </button>
             </form>
         </div>
     @elseif(isset($transaksis))
-        <h3>Daftar Transaksi yang Dapat Dibatalkan</h3>
-        <table border="1" cellpadding="8" cellspacing="0" style="margin-top:10px; width: 100%;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nama Pembeli</th>
-                    <th>Nama Barang</th>
-                    <th>Jumlah</th>
-                    <th>Harga Barang</th>
-                    <th>Diskon (%)</th>
-                    <th>Total Harga</th>
-                    <th>Tanggal Pembelian</th>
-                    <th>Tipe Pembayaran</th>
-                    <th>Alamat Pengantaran</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transaksis as $transaksi)
+        <h3 class="mb-4 text-lg font-semibold">Daftar Transaksi yang Dapat Dibatalkan</h3>
+        <div class="overflow-x-auto">
+            <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <td>{{ $transaksi->id }}</td>
-                        <td>{{ $transaksi->customer->nama_customer }}</td>
-                        <td>{{ $transaksi->barang->nama_barang }}</td>
-                        <td>{{ $transaksi->jumlah }}</td>
-                        <td>Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
-                        <td>{{ $transaksi->diskon }}</td>
-                        <td>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
-                        <td>{{ $transaksi->tanggal_pembelian->format('d-m-Y') }}</td>
-                        <td>{{ ucfirst($transaksi->tipe_pembayaran) }}</td>
-                        <td>{{ $transaksi->alamat_pengantaran }}</td>
-                        <td><a href="{{ route('transaksi.listBatal', ['id' => $transaksi->id]) }}">Batalkan</a></td>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">ID</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Nama Pembeli</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Nama Barang</th>
+                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Jumlah</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Harga Barang</th>
+                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Diskon (%)</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Total Harga</th>
+                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Tanggal Pembelian</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Tipe Pembayaran</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Alamat Pengantaran</th>
+                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Aksi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach($transaksis as $transaksi)
+                        <tr class="hover:bg-gray-100">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->id }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->customer->nama_customer }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->barang->nama_barang }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->jumlah }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm text-gray-700 border-b border-gray-300">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->diskon }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm text-gray-700 border-b border-gray-300">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->tanggal_pembelian->format('d-m-Y') }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ ucfirst($transaksi->tipe_pembayaran) }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->alamat_pengantaran }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm border-b border-gray-300 space-x-2">
+                                <a href="{{ route('transaksi.listBatal', ['id' => $transaksi->id]) }}" class="text-blue-600 hover:underline">Batalkan</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-        {{ $transaksis->links() }}
+        <div class="mt-4">
+            {{ $transaksis->links() }}
+        </div>
     @endif
 
 @endsection
