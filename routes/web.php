@@ -12,9 +12,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [OwnerController::class, 'dashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -45,6 +45,9 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('data-barang', [OwnerController::class, 'dataBarang']);
     Route::get('data-customer', [OwnerController::class, 'dataCustomer']);
     Route::resource('user', UserController::class);
+
+    Route::get('laporan-penjualan', [OwnerController::class, 'laporanPenjualan'])->name('owner.laporanPenjualan');
+    Route::get('laporan-barang-return', [OwnerController::class, 'laporanBarangReturn'])->name('owner.laporanBarangReturn');
 });
 
 require __DIR__.'/auth.php';

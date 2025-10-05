@@ -46,7 +46,11 @@
             </form>
         </div>
     @elseif(isset($transaksis))
-        <h3 class="mb-4 text-lg font-semibold">Daftar Transaksi yang Dapat Dibatalkan</h3>
+        @if(auth()->user()->role == 'owner')
+            <h3 class="mb-4 text-lg font-semibold">Daftar Transaksi saja</h3>
+        @else
+            <h3 class="mb-4 text-lg font-semibold">Transaksi yang ingin dibatalkan</h3>
+        @endif
         <div class="overflow-x-auto">
             <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
                 <thead class="bg-gray-50">

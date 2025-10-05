@@ -15,7 +15,7 @@ class TransaksiController extends Controller
     {
         $customers = Customer::all();
         $customer = null;
-        $searchResults = collect();
+        $barangs = Barang::all();
         $cart = session('cart', []);
 
         // Store selected customer_id in session if provided
@@ -26,11 +26,7 @@ class TransaksiController extends Controller
             $customer = Customer::find(session('selected_customer_id'));
         }
 
-        if ($request->filled('search_barang')) {
-            $searchResults = Barang::where('nama_barang', 'like', '%' . $request->search_barang . '%')->get();
-        }
-
-        return view('transaksi.index', compact('customers', 'customer', 'searchResults', 'cart'));
+        return view('transaksi.index', compact('customers', 'customer', 'barangs', 'cart'));
     }
 
     public function addToCart(Request $request)

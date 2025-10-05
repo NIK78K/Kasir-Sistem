@@ -4,18 +4,22 @@
 
 @section('content')
     <div class="max-w-6xl mx-auto p-6">
-        {{-- Header --}}
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24"
+        {{-- Banner Selamat Datang --}}
+        <div class="mb-8 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 p-6 shadow-lg">
+            <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 Data Customer
             </h1>
+        </div>
+
+        {{-- Tombol Tambah --}}
+        <div class="mb-6 flex justify-end">
             <a href="{{ route('customer.create') }}"
-                class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition flex items-center gap-2">
+                class="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition flex items-center gap-2 font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -26,55 +30,57 @@
 
         {{-- Alert --}}
         @if (session('success'))
-            <div class="mb-4 p-4 bg-green-100 border border-green-300 text-green-800 rounded-lg">
-                {{ session('success') }}
+            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow">
+                ✅ {{ session('success') }}
             </div>
         @endif
 
         {{-- Table --}}
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg border border-gray-200">
+        <div class="overflow-x-auto bg-white shadow-lg rounded-xl border border-gray-200">
             <table class="min-w-full text-sm text-gray-700">
-                <thead class="bg-gray-100 border-b border-gray-300">
+                <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-300">
                     <tr>
-                        <th class="py-3 px-4 text-left font-semibold">ID</th>
-                        <th class="py-3 px-4 text-left font-semibold">Nama Customer</th>
-                        <th class="py-3 px-4 text-left font-semibold">Alamat</th>
-                        <th class="py-3 px-4 text-left font-semibold">No HP</th>
-                        <th class="py-3 px-4 text-left font-semibold">Tipe Pembeli</th>
-                        <th class="py-3 px-4 text-center font-semibold">Aksi</th>
+                        <th class="py-4 px-4 text-left font-semibold text-gray-800">ID</th>
+                        <th class="py-4 px-4 text-left font-semibold text-gray-800">Nama Customer</th>
+                        <th class="py-4 px-4 text-left font-semibold text-gray-800">Alamat</th>
+                        <th class="py-4 px-4 text-left font-semibold text-gray-800">No HP</th>
+                        <th class="py-4 px-4 text-left font-semibold text-gray-800">Tipe Pembeli</th>
+                        <th class="py-4 px-4 text-center font-semibold text-gray-800">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-gray-200">
                     @foreach ($customers as $customer)
-                        <tr class="border-b hover:bg-gray-50 transition">
-                            <td class="py-3 px-4">{{ $customer->id }}</td>
-                            <td class="py-3 px-4 font-medium">{{ $customer->nama_customer }}</td>
-                            <td class="py-3 px-4">{{ $customer->alamat }}</td>
-                            <td class="py-3 px-4">{{ $customer->no_hp }}</td>
-                            <td class="py-3 px-4">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="py-4 px-4">{{ $customer->id }}</td>
+                            <td class="py-4 px-4 font-medium text-gray-900">{{ $customer->nama_customer }}</td>
+                            <td class="py-4 px-4">{{ $customer->alamat }}</td>
+                            <td class="py-4 px-4">{{ $customer->no_hp }}</td>
+                            <td class="py-4 px-4">
                                 <span
-                                    class="px-2 py-1 text-xs rounded-full 
+                                    class="px-3 py-1 text-xs font-semibold rounded-full 
                                     {{ $customer->tipe_pembeli == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
                                     {{ ucfirst($customer->tipe_pembeli) }}
                                 </span>
                             </td>
-                            <td class="py-3 px-4 text-center space-x-2">
-                                {{-- Tombol Edit --}}
-                                <a href="{{ route('customer.edit', $customer->id) }}"
-                                    class="inline-block px-3 py-1.5 bg-blue-600 text-white rounded-md shadow hover:bg-blue-700 transition">
-                                    Edit
-                                </a>
+                            <td class="py-4 px-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    {{-- Tombol Edit --}}
+                                    <a href="{{ route('customer.edit', $customer->id) }}"
+                                        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition font-semibold text-xs">
+                                        Edit
+                                    </a>
 
-                                {{-- Tombol Hapus --}}
-                                <form action="{{ route('customer.destroy', $customer->id) }}" method="POST" class="inline"
-                                    onsubmit="return confirm('Yakin hapus data ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="inline-block px-3 py-1.5 bg-red-600 text-white rounded-md shadow hover:bg-red-700 transition">
-                                        Hapus
-                                    </button>
-                                </form>
+                                    {{-- Tombol Hapus --}}
+                                    <form action="{{ route('customer.destroy', $customer->id) }}" method="POST"
+                                        onsubmit="return confirm('Yakin hapus data ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-xs">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -82,7 +88,7 @@
                     {{-- Jika kosong --}}
                     @if ($customers->isEmpty())
                         <tr>
-                            <td colspan="6" class="py-6 text-center text-gray-500">
+                            <td colspan="6" class="py-8 text-center text-gray-500">
                                 Belum ada data customer.
                             </td>
                         </tr>

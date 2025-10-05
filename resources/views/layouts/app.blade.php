@@ -37,6 +37,12 @@
         <!-- Menu -->
         @if($user->role === 'kasir')
             <ul class="space-y-2 text-sm">
+                <!-- Dashboard Link -->
+                <li>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold hover:text-blue-400 transition {{ request()->routeIs('dashboard') ? 'text-blue-400' : '' }}">
+                    Dashboard
+                </a>
+                </li>
                 <!-- Kelola Data Barang -->
                 <li x-data="{ open: false }">
                     <button @click="open = !open" class="flex justify-between items-center w-full font-semibold hover:text-blue-400 transition">
@@ -86,8 +92,14 @@
 
         @elseif($user->role === 'owner')
             <ul class="space-y-2 text-sm">
-                <li><a href="{{ url('data-barang') }}" class="text-blue-400 hover:text-blue-600">Data Barang (Hanya Lihat)</a></li>
-                <li><a href="{{ url('data-customer') }}" class="text-blue-400 hover:text-blue-600">Data Customer (Hanya Lihat)</a></li>
+                <!-- Dashboard Link -->
+                <li>
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 font-semibold hover:text-blue-400 transition {{ request()->routeIs('dashboard') ? 'text-blue-400' : '' }}">
+                    Dashboard
+                    </a>
+                </li>
+                <li><a href="{{ url('data-barang') }}" class="text-blue-400 hover:text-blue-600">Data Barang</a></li>
+                <li><a href="{{ url('data-customer') }}" class="text-blue-400 hover:text-blue-600">Data Customer</a></li>
 
                 <!-- Kelola Data User -->
                 <li x-data="{ open: false }">
@@ -102,6 +114,20 @@
                         <li><a href="{{ route('user.index') }}" class="text-blue-400 hover:text-blue-600">Data User</a></li>
                     </ul>
                 </li>
+
+                <!-- Laporan -->
+                <li x-data="{ open: false }">
+                    <button @click="open = !open" class="flex justify-between items-center w-full font-semibold hover:text-blue-400 transition">
+                        Laporan
+                        <svg :class="{'rotate-90': open}" class="w-4 h-4 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <ul x-show="open" x-transition class="mt-2 ml-4 space-y-1">
+                        <li><a href="{{ route('owner.laporanPenjualan') }}" class="text-blue-400 hover:text-blue-600">Laporan Penjualan</a></li>
+                        <li><a href="{{ route('owner.laporanBarangReturn') }}" class="text-blue-400 hover:text-blue-600">Laporan Barang Return</a></li>
+                    </ul>
+                </li>
             </ul>
         @endif
     </div>
@@ -114,16 +140,32 @@
     <h2 class="absolute left-1/2 transform -translate-x-1/2 text-xl font-semibold">Sistem AMKas</h2>
 
     <!-- Profil di kanan -->
-    <div class="ml-auto profile-header flex items-center space-x-4">
+    <div class="ml-auto profile-header flex items-center space-x-4" x-data="{ showLogoutModal: false }">
         <span class="font-semibold text-gray-200 hover:text-white transition">
             {{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})
         </span>
-        <form method="POST" action="{{ route('logout') }}" class="inline">
-            @csrf
-            <button type="submit" class="bg-red-600 px-3 py-1 rounded text-white font-semibold hover:bg-red-700 shadow transition">
-                Logout
-            </button>
-        </form>
+        <button @click="showLogoutModal = true" class="bg-red-600 px-3 py-1 rounded text-white font-semibold hover:bg-red-700 shadow transition">
+            Logout
+        </button>
+
+        <!-- Logout Confirmation Modal -->
+        <div x-show="showLogoutModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" @click.self="showLogoutModal = false">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
+                <p class="text-gray-600 mb-6">Apakah Anda yakin ingin logout dari sistem?</p>
+                <div class="flex justify-end space-x-3">
+                    <button @click="showLogoutModal = false" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition">
+                        Batal
+                    </button>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                            Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
