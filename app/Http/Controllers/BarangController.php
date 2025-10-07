@@ -32,15 +32,16 @@ class BarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
+            'nama_barang' => 'required|string|max:255|unique:barangs,nama_barang',
             'harga' => 'required|integer|min:0',
             'harga_grosir' => 'nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|string|max:255',
+            'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori', 'diskon');
 
         if ($request->hasFile('gambar')) {
             $imagePath = $request->file('gambar')->store('barang_images', 'public');
@@ -60,15 +61,16 @@ class BarangController extends Controller
     public function update(Request $request, Barang $barang)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
+            'nama_barang' => 'required|string|max:255|unique:barangs,nama_barang,' . $barang->id,
             'harga' => 'required|integer|min:0',
             'harga_grosir' => 'nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|string|max:255',
+            'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori', 'diskon');
 
         if ($request->hasFile('gambar')) {
             $imagePath = $request->file('gambar')->store('barang_images', 'public');

@@ -41,8 +41,9 @@ class TransaksiController extends Controller
 
         $cart = session('cart', []);
 
-        // Determine harga based on tipe_harga
+        // Determine harga based on tipe_harga and apply discount
         $harga = $request->tipe_harga === 'grosir' ? $barang->harga_grosir : $barang->harga;
+        $harga = $harga * (100 - $barang->diskon) / 100;
 
         // Check if barang with same tipe_harga already in cart
         $found = false;
@@ -95,12 +96,13 @@ class TransaksiController extends Controller
 
                 $total_harga = $item['harga'] * $item['jumlah'];
 
+                $barangModel = Barang::findOrFail($item['barang_id']);
                 $transaksi = Transaksi::create([
                     'customer_id' => $customer->id,
                     'barang_id' => $barang->id,
                     'jumlah' => $item['jumlah'],
                     'harga_barang' => $item['harga'],
-                    'diskon' => 0,
+                    'diskon' => $barangModel->diskon,
                     'total_harga' => $total_harga,
                     'tanggal_pembelian' => now(),
                     'tipe_pembayaran' => $request->tipe_pembayaran,

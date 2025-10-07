@@ -28,6 +28,7 @@
                     <th class="border px-4 py-2">Barang</th>
                     <th class="border px-4 py-2">Jumlah</th>
                     <th class="border px-4 py-2">Harga Satuan</th>
+                    <th class="border px-4 py-2">Diskon</th>
                     <th class="border px-4 py-2">Total</th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@
                         <td class="border px-4 py-2">{{ $transaksi->barang->nama_barang }}</td>
                         <td class="border px-4 py-2">{{ $transaksi->jumlah }}</td>
                         <td class="border px-4 py-2">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+                        <td class="border px-4 py-2">{{ $transaksi->diskon }}%</td>
                         <td class="border px-4 py-2">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach

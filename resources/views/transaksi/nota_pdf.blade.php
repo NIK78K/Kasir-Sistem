@@ -28,6 +28,7 @@
                 <th>Barang</th>
                 <th>Jumlah</th>
                 <th>Harga Satuan</th>
+                <th>Diskon</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -37,6 +38,7 @@
                     <td>{{ $transaksi->barang->nama_barang }}</td>
                     <td>{{ $transaksi->jumlah }}</td>
                     <td>Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+                    <td>{{ $transaksi->diskon }}%</td>
                     <td>Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
                 </tr>
             @endforeach

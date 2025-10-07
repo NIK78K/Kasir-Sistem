@@ -21,7 +21,7 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_customer' => 'required|string|max:255',
+            'nama_customer' => 'required|string|max:255|unique:customers,nama_customer',
             'alamat' => 'nullable|string',
             'tipe_pembeli' => 'required|in:pembeli,bengkel,langganan',
             'no_hp' => 'nullable|string|max:20',
@@ -40,7 +40,7 @@ class CustomerController extends Controller
     public function update(Request $request, Customer $customer)
     {
         $request->validate([
-            'nama_customer' => 'required|string|max:255',
+            'nama_customer' => 'required|string|max:255|unique:customers,nama_customer,' . $customer->id,
             'alamat' => 'nullable|string',
             'tipe_pembeli' => 'required|in:pembeli,bengkel,langganan',
             'no_hp' => 'nullable|string|max:20',
