@@ -108,8 +108,7 @@
     </div>
 
     {{-- Search Barang --}}
-    {{-- Remove search barang section as per request --}}
-    {{-- <div class="mb-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+    <div class="mb-8 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
         <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -124,7 +123,7 @@
                 Cari Barang
             </button>
         </form>
-    </div> --}}
+    </div>
 
     {{-- Daftar Barang --}}
     @if($barangs->count() > 0)
@@ -144,6 +143,11 @@
                             @else
                                 <span class="text-gray-400 italic group-hover:text-white">No Image</span>
                             @endif
+                            @if($barang->isNew())
+                                <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
+                                    NEW
+                                </div>
+                            @endif
                             @if($barang->diskon > 0)
                                 <div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
                                     -{{ $barang->diskon }}%
@@ -153,7 +157,7 @@
                         <div class="flex-grow flex flex-col justify-between">
                             <div class="space-y-2">
                                 <p class="text-lg font-bold text-gray-900 group-hover:text-white line-clamp-2">{{ $barang->nama_barang }}</p>
-                                <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga Grosir & Bengkel:</span> 
+                                <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga Grosir & Bengkel:</span>
                                     @if($barang->diskon > 0)
                                         <span class="line-through">Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}</span>
                                         <span class="ml-2 font-bold text-green-400">Rp {{ number_format($barang->harga_grosir * (100 - $barang->diskon) / 100, 0, ',', '.') }}</span>
@@ -161,7 +165,7 @@
                                         Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}
                                     @endif
                                 </p>
-                                <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga:</span> 
+                                <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga:</span>
                                     @if($barang->diskon > 0)
                                         <span class="line-through">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
                                         <span class="ml-2 font-bold text-green-400">Rp {{ number_format($barang->harga * (100 - $barang->diskon) / 100, 0, ',', '.') }}</span>

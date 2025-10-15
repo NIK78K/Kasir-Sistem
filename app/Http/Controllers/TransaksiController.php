@@ -15,8 +15,15 @@ class TransaksiController extends Controller
     {
         $customers = Customer::all();
         $customer = null;
-        $barangs = Barang::all();
+        $query = Barang::query();
         $cart = session('cart', []);
+
+        // Filter barang berdasarkan search
+        if ($request->filled('search_barang')) {
+            $query->where('nama_barang', 'like', '%' . $request->search_barang . '%');
+        }
+
+        $barangs = $query->orderBy('created_at', 'desc')->get();
 
         // Store selected customer_id in session if provided
         if ($request->filled('customer_id')) {
@@ -303,4 +310,3 @@ class TransaksiController extends Controller
         return redirect()->route('transaksi.barangReturn', ['id' => $transaksi->id])->with('success', 'Barang berhasil dikembalikan');
     }
 }
-

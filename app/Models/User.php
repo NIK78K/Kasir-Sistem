@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'last_viewed_barang_at',
+        'last_viewed_customer_at',
     ];
 
     /**
@@ -44,6 +46,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'last_viewed_barang_at' => 'datetime',
+            'last_viewed_customer_at' => 'datetime',
         ];
     }
 }

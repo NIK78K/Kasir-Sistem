@@ -42,18 +42,13 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
 });
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
-    Route::get('data-barang', [OwnerController::class, 'dataBarang']);
-    Route::get('data-customer', [OwnerController::class, 'dataCustomer']);
+    Route::get('data-barang', [OwnerController::class, 'dataBarang'])->name('owner.dataBarang');
+    Route::get('data-customer', [OwnerController::class, 'dataCustomer'])->name('owner.dataCustomer');
     Route::resource('user', UserController::class);
 
     Route::get('laporan-penjualan', [OwnerController::class, 'laporanPenjualan'])->name('owner.laporanPenjualan');
+    Route::get('laporan-penjualan/export', [OwnerController::class, 'laporanPenjualanExport'])->name('owner.laporanPenjualanExport');
     Route::get('laporan-barang-return', [OwnerController::class, 'laporanBarangReturn'])->name('owner.laporanBarangReturn');
 });
 
 require __DIR__.'/auth.php';
-
-
-
-
-
-

@@ -7,6 +7,9 @@
 
     <title>SISTEM AMKAS @yield('title')</title>
 
+    <!-- Icon -->
+    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -23,7 +26,7 @@
 </head>
     <body class="font-sans bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300">
     <!-- Sidebar -->
-    <div class="fixed top-0 left-0 bottom-0 w-64 text-white shadow-xl flex flex-col z-40" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="fixed top-0 left-0 bottom-0 w-64 text-white shadow-xl flex flex-col" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <!-- Header Sidebar -->
         <div class="p-6 text-center border-b border-gray-700" style="border-color: rgba(255, 255, 255, 0.3);">
             <h1 class="text-2xl font-bold tracking-wide">AMKAS</h1>
@@ -37,8 +40,8 @@
             @endphp
 
             <!-- Profile Section -->
-            <div class="mb-6 p-4 rounded-lg shadow-inner" style="background: rgba(102, 126, 234, 0.3);">
-                <p class="font-bold text-base mb-1">{{ $user->name }}</p>
+            <div class="mb-6 p-4 rounded-lg shadow-inner bg-purple-500/30">
+                <p class="font-bold text-sm md:text-base mb-1">{{ $user->name }}</p>
                 <p class="text-xs text-gray-200">{{ ucfirst($user->role) }}</p>
             </div>
 
@@ -141,16 +144,28 @@
                     </li>
                     
                     <li>
-                        <a href="{{ url('data-barang') }}" 
+                        <a href="{{ url('data-barang') }}"
                            class="flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition hover:bg-gray-800 text-gray-300">
                             Data Barang
+                            @php
+                                $newBarangCount = \App\Models\Barang::where('created_at', '>', auth()->user()->last_viewed_barang_at ?? '1970-01-01 00:00:00')->count();
+                            @endphp
+                            @if($newBarangCount > 0)
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $newBarangCount }}+</span>
+                            @endif
                         </a>
                     </li>
                     
                     <li>
-                        <a href="{{ url('data-customer') }}" 
+                        <a href="{{ url('data-customer') }}"
                            class="flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition hover:bg-gray-800 text-gray-300">
                             Data Customer
+                            @php
+                                $newCustomerCount = \App\Models\Customer::where('created_at', '>', auth()->user()->last_viewed_customer_at ?? '1970-01-01 00:00:00')->count();
+                            @endphp
+                            @if($newCustomerCount > 0)
+                                <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full">{{ $newCustomerCount }}+</span>
+                            @endif
                         </a>
                     </li>
 
@@ -211,10 +226,10 @@
             </button>
 
             <!-- Logout Confirmation Modal -->
-            <div x-show="showLogoutModal" x-cloak 
-                 class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" 
-                 @click.self="showLogoutModal = false">
-                <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <div x-show="showLogoutModal" x-cloak
+                 class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
+                 @click.self="showLogoutModal = false" style="display: none;">
+                <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4 z-[10000]">
                     <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
                     <p class="text-gray-600 mb-6">Apakah Anda yakin ingin logout dari sistem?</p>
                     <div class="flex justify-end space-x-3">
@@ -238,11 +253,13 @@
         <!-- Main Content Area -->
         <div class="ml-64 min-h-screen flex flex-col">
         <!-- Header -->
-        <header class="text-white px-6 py-4 shadow-md sticky top-0 z-30" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <div class="relative flex items-center justify-center">
-                <h2 class="text-xl font-semibold">SISTEM AMKAS</h2>
-                <div class="absolute right-0 flex items-center space-x-4">
-                    <span class="text-sm font-medium text-gray-200">
+        <header class="text-white px-4 md:px-6 py-4 shadow-md sticky top-0 z-30" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="relative flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-semibold hidden sm:block">SISTEM AMKAS</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm font-medium text-gray-200 hidden sm:block">
                         {{ auth()->user()->name }} <span class="text-gray-300">({{ ucfirst(auth()->user()->role) }})</span>
                     </span>
                 </div>
@@ -250,14 +267,14 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 p-6">
-            <div class="bg-white rounded-2xl shadow-lg p-6 min-h-[calc(100vh-200px)]">
+        <main class="flex-1 p-4 md:p-6">
+            <div class="bg-white rounded-2xl shadow-lg p-4 md:p-6 min-h-[calc(100vh-200px)]">
                 @yield('content')
             </div>
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white text-center text-sm text-gray-600 py-4 border-t shadow-inner">
+        <footer class="bg-white text-center text-sm text-gray-600 py-4 border-t shadow-inner px-4 md:px-0">
             &copy; 2024 <span class="font-semibold text-gray-800">Anugrah Mandiri</span>. All rights reserved.
         </footer>
     </div>

@@ -35,8 +35,8 @@
             </div>
         @endif
 
-        {{-- Table --}}
-        <div class="overflow-x-auto bg-white shadow-lg rounded-xl border border-gray-200">
+        {{-- Table for Desktop --}}
+        <div class="hidden md:block overflow-x-auto bg-white shadow-lg rounded-xl border border-gray-200">
             <table class="min-w-full text-sm text-gray-700">
                 <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-300">
                     <tr>
@@ -57,7 +57,7 @@
                             <td class="py-4 px-4">{{ $customer->no_hp }}</td>
                             <td class="py-4 px-4">
                                 <span
-                                    class="px-3 py-1 text-xs font-semibold rounded-full 
+                                    class="px-3 py-1 text-xs font-semibold rounded-full
                                     {{ $customer->tipe_pembeli == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
                                     {{ ucfirst($customer->tipe_pembeli) }}
                                 </span>
@@ -95,6 +95,47 @@
                     @endif
                 </tbody>
             </table>
+        </div>
+
+        {{-- Cards for Mobile --}}
+        <div class="block md:hidden space-y-4">
+            @foreach ($customers as $customer)
+                <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-4">
+                    <div class="flex justify-between items-start mb-3">
+                        <h3 class="text-lg font-bold text-gray-900">{{ $customer->nama_customer }}</h3>
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $customer->tipe_pembeli == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                            {{ ucfirst($customer->tipe_pembeli) }}
+                        </span>
+                    </div>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        <p><strong>ID:</strong> {{ $customer->id }}</p>
+                        <p><strong>Alamat:</strong> {{ $customer->alamat }}</p>
+                        <p><strong>No HP:</strong> {{ $customer->no_hp }}</p>
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <a href="{{ route('customer.edit', $customer->id) }}"
+                            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition font-semibold text-center text-sm">
+                            Edit
+                        </a>
+                        <form action="{{ route('customer.destroy', $customer->id) }}" method="POST"
+                            onsubmit="return confirm('Yakin hapus data ini?')" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-sm">
+                                Hapus
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+
+            {{-- Jika kosong --}}
+            @if ($customers->isEmpty())
+                <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+                    Belum ada data customer.
+                </div>
+            @endif
         </div>
     </div>
 @endsection

@@ -31,7 +31,7 @@
 
             {{-- Harga --}}
             <div>
-                <label class="block font-medium text-gray-700">Harga</label>
+                <label class="block font-medium text-gray-700">Harga <span class="text-sm text-gray-500">(isi salah satu: harga atau harga grosir)</span></label>
                 <input type="number" name="harga" value="{{ old('harga') }}"
                        class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
                        placeholder="Masukkan harga">
@@ -39,7 +39,7 @@
 
             {{-- Harga Grosir --}}
             <div>
-                <label class="block font-medium text-gray-700">Harga Grosir</label>
+                <label class="block font-medium text-gray-700">Harga Grosir <span class="text-sm text-gray-500">(isi salah satu: harga atau harga grosir)</span></label>
                 <input type="number" name="harga_grosir" value="{{ old('harga_grosir') }}"
                        class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
                        placeholder="Masukkan harga grosir">

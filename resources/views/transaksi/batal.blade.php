@@ -47,7 +47,12 @@
         </div>
     @elseif(isset($transaksis))
         @if(auth()->user()->role == 'owner')
-            <h3 class="mb-4 text-lg font-semibold">Daftar Transaksi saja</h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Laporan Penjualan</h3>
+                <a href="{{ route('owner.laporanPenjualanExport') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    Export to Excel
+                </a>
+            </div>
         @else
             <h3 class="mb-4 text-lg font-semibold">Transaksi yang ingin dibatalkan</h3>
         @endif

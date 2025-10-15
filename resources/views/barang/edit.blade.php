@@ -27,13 +27,13 @@
             </div>
 
             <div>
-                <label for="harga" class="block font-semibold mb-1">Harga:</label>
+                <label for="harga" class="block font-semibold mb-1">Harga: <span class="text-sm text-gray-500">(isi salah satu: harga atau harga grosir)</span></label>
                 <input id="harga" type="number" name="harga" value="{{ old('harga', $barang->harga) }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
 
             <div>
-                <label for="harga_grosir" class="block font-semibold mb-1">Harga Grosir:</label>
+                <label for="harga_grosir" class="block font-semibold mb-1">Harga Grosir: <span class="text-sm text-gray-500">(isi salah satu: harga atau harga grosir)</span></label>
                 <input id="harga_grosir" type="number" name="harga_grosir" value="{{ old('harga_grosir', $barang->harga_grosir) }}"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>

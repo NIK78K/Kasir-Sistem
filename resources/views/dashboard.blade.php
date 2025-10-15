@@ -176,7 +176,7 @@
                 <span class="menu-icon">👥</span>
                 <span>Data Customer</span>
             </a>
-            <a href="{{ url('barang-return') }}" class="menu-item">
+            <a href="{{ route('transaksi.listReturnable') }}" class="menu-item">
                 <span class="menu-icon">↩️</span>
                 <span>Barang Return</span>
             </a>

@@ -10,4 +10,21 @@ class Barang extends Model
     use HasFactory;
 
     protected $fillable = ['nama_barang', 'harga', 'stok', 'kategori', 'harga_grosir', 'gambar', 'diskon'];
+
+    protected $casts = [
+        'harga' => 'integer',
+        'harga_grosir' => 'integer',
+        'stok' => 'integer',
+        'diskon' => 'integer',
+    ];
+
+    public function transaksis()
+    {
+        return $this->hasMany(Transaksi::class);
+    }
+
+    public function isNew()
+    {
+        return $this->transaksis()->where('status', 'selesai')->doesntExist();
+    }
 }
