@@ -28,6 +28,8 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::post('transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::post('transaksi/add-to-cart', [TransaksiController::class, 'addToCart'])->name('transaksi.addToCart');
+    Route::delete('transaksi/remove-from-cart/{index}', [TransaksiController::class, 'removeFromCart'])->name('transaksi.removeFromCart');
+    Route::post('transaksi/update-cart-quantity/{index}', [TransaksiController::class, 'updateCartQuantity'])->name('transaksi.updateCartQuantity');
     Route::post('transaksi/confirm-order', [TransaksiController::class, 'confirmOrder'])->name('transaksi.confirmOrder');
     Route::get('transaksi/confirm', [TransaksiController::class, 'confirm'])->name('transaksi.confirm');
     Route::get('transaksi/export-pdf', [TransaksiController::class, 'exportPdf'])->name('transaksi.exportPdf');

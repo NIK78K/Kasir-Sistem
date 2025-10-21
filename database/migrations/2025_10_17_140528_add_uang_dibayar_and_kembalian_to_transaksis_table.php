@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('barangs', function (Blueprint $table) {
-            $table->unsignedInteger('diskon')->default(0)->after('harga_grosir')->comment('Diskon dalam persen');
+        Schema::table('transaksis', function (Blueprint $table) {
+            $table->decimal('uang_dibayar', 15, 2)->nullable()->after('total_harga');
+            $table->decimal('kembalian', 15, 2)->nullable()->after('uang_dibayar');
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('barangs', function (Blueprint $table) {
-            $table->dropColumn('diskon');
+        Schema::table('transaksis', function (Blueprint $table) {
+            $table->dropColumn(['uang_dibayar', 'kembalian']);
         });
     }
 };

@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto p-6">
     {{-- Banner Selamat Datang --}}
-    <div class="mb-8 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 p-6 shadow-lg">
+    <div class="mb-8 rounded-2xl p-6 shadow-lg" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
         <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
             📦 Data Barang
         </h1>
@@ -16,15 +16,17 @@
         <form method="GET" action="{{ route('owner.dataBarang') }}" class="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
             <select name="kategori" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition bg-white">
                 <option value="">Kategori Spare Part</option>
-                <option value="Elektronik" {{ request('kategori') == 'Elektronik' ? 'selected' : '' }}>Elektronik</option>
-                <option value="Pakaian" {{ request('kategori') == 'Pakaian' ? 'selected' : '' }}>Pakaian</option>
-                <option value="Makanan" {{ request('kategori') == 'Makanan' ? 'selected' : '' }}>Makanan</option>
-                <option value="Lainnya" {{ request('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                    <option value="Sepeda Pacifik" {{ request('kategori') == 'Sepeda Pacifik' ? 'selected' : '' }}>Sepeda Pacifik</option>
+                    <option value="Sepeda Listrik" {{ request('kategori') == 'Sepeda Listrik' ? 'selected' : '' }}>Sepeda Listrik</option>
+                    <option value="Ban" {{ request('kategori') == 'Ban' ? 'selected' : '' }}>Ban</option>
+                    <option value="Sepeda Stroller" {{ request('kategori') == 'Sepeda Stroller' ? 'selected' : '' }}>Sepeda Stroller</option>
+                    <option value="Sparepart" {{ request('kategori') == 'Sparepart' ? 'selected' : '' }}>Sparepart</option>
+                    <option value="Lainnya" {{ request('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
             </select>
             <input type="text" name="search" placeholder="Cari Barang" value="{{ request('search') }}"
                 class="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition" />
             <button type="submit"
-                class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold whitespace-nowrap">
+                class="px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-semibold whitespace-nowrap">
                 Cari Barang
             </button>
         </form>
@@ -51,53 +53,38 @@
     {{-- Daftar Barang --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @foreach($barangs as $barang)
-            <div class="border rounded-xl p-6 flex flex-col space-y-4 shadow-md hover:shadow-2xl transition-all duration-300 bg-white hover:bg-indigo-600 hover:text-white hover:-translate-y-2 hover:scale-105 group">
-                <div class="w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center group-hover:bg-indigo-700 relative">
+            <div class="border rounded-xl p-6 flex flex-col space-y-4 shadow-md hover:shadow-2xl transition-all duration-300 bg-white hover:-translate-y-2 hover:scale-105">
+                <div class="w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative">
                     @if($barang->gambar)
-                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}" class="object-cover w-full h-full group-hover:brightness-110" />
+                        <img src="{{ asset('storage/' . $barang->gambar) }}" alt="{{ $barang->nama_barang }}" class="object-cover w-full h-full" />
                     @else
-                        <span class="text-gray-400 italic group-hover:text-white">No Image</span>
+                        <span class="text-gray-400 italic">No Image</span>
                     @endif
                     @if($barang->isNew())
                         <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
                             NEW
                         </div>
                     @endif
-                    @if($barang->diskon > 0)
-                        <div class="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg">
-                            -{{ $barang->diskon }}%
-                        </div>
-                    @endif
                 </div>
                 <div class="flex-grow flex flex-col justify-between">
                     <div class="space-y-2">
-                        <p class="text-lg font-bold text-gray-900 group-hover:text-white line-clamp-2">{{ $barang->nama_barang }}</p>
+                        <p class="text-lg font-bold text-gray-900 line-clamp-2">{{ $barang->nama_barang }}</p>
                         @if($barang->harga_grosir)
-                            <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga Grosir & Bengkel:</span>
-                                @if($barang->diskon > 0)
-                                    <span class="line-through">Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}</span>
-                                    <span class="ml-2 font-bold text-green-400">Rp {{ number_format($barang->harga_grosir * (100 - $barang->diskon) / 100, 0, ',', '.') }}</span>
-                                @else
-                                    Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}
-                                @endif
+                            <p class="text-sm text-gray-600"><span class="font-semibold">Harga Grosir & Bengkel:</span>
+                                <span class="text-blue-600">Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}</span>
                             </p>
                         @else
-                            <p class="text-sm text-gray-400 group-hover:text-gray-300"><span class="font-semibold">Harga Grosir & Bengkel:</span> -</p>
+                            <p class="text-sm text-gray-400"><span class="font-semibold">Harga Grosir & Bengkel:</span> -</p>
                         @endif
                         @if($barang->harga)
-                            <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Harga:</span>
-                                @if($barang->diskon > 0)
-                                    <span class="line-through">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
-                                    <span class="ml-2 font-bold text-green-400">Rp {{ number_format($barang->harga * (100 - $barang->diskon) / 100, 0, ',', '.') }}</span>
-                                @else
-                                    Rp {{ number_format($barang->harga, 0, ',', '.') }}
-                                @endif
+                            <p class="text-sm text-gray-600"><span class="font-semibold">Harga:</span>
+                                <span class="text-green-600">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
                             </p>
                         @else
-                            <p class="text-sm text-gray-400 group-hover:text-gray-300"><span class="font-semibold">Harga:</span> -</p>
+                            <p class="text-sm text-gray-400"><span class="font-semibold">Harga:</span> -</p>
                         @endif
-                        <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Stok:</span> <span class="text-green-600 font-semibold group-hover:text-green-200">{{ $barang->stok }}</span></p>
-                        <p class="text-sm text-gray-600 group-hover:text-white"><span class="font-semibold">Kategori:</span> {{ $barang->kategori }}</p>
+                        <p class="text-sm text-gray-600"><span class="font-semibold">Stok:</span> <span class="text-green-600 font-semibold">{{ $barang->stok }}</span></p>
+                        <p class="text-sm text-gray-600"><span class="font-semibold">Kategori:</span> {{ $barang->kategori }}</p>
                     </div>
                 </div>
             </div>

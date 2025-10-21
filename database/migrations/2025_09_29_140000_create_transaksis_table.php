@@ -14,7 +14,6 @@ class CreateTransaksisTable extends Migration
             $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->integer('jumlah');
             $table->decimal('harga_barang', 15, 2);
-            $table->decimal('diskon', 5, 2)->default(0);
             $table->decimal('total_harga', 15, 2);
             $table->date('tanggal_pembelian');
             $table->string('tipe_pembayaran');

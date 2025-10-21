@@ -1,182 +1,136 @@
 <x-guest-layout>
-    <style>
-        .login-wrapper {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 24px;
-            padding: 48px 40px;
-            max-width: 440px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.6s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .login-header {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-        
-        .login-logo {
-            font-size: 36px;
-            font-weight: 600;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-        
-        .login-subtitle {
-            font-size: 16px;
-            color: #666;
-        }
-        
-        /* Override default input styles */
-        input[type="email"],
-        input[type="password"] {
-            border: 2px solid #e0e0e0 !important;
-            border-radius: 12px !important;
-            padding: 12px 16px !important;
-            font-size: 15px !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        input[type="email"]:focus,
-        input[type="password"]:focus {
-            border-color: #667eea !important;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
-            outline: none !important;
-        }
-        
-        input[type="checkbox"] {
-            width: 18px !important;
-            height: 18px !important;
-            border-radius: 6px !important;
-            cursor: pointer !important;
-        }
-        
-        label {
-            font-weight: 500 !important;
-            color: #333 !important;
-        }
-        
-        /* Button styling */
-        button[type="submit"] {
-            width: 100%;
-            padding: 14px !important;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-            border: none !important;
-            border-radius: 12px !important;
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
-            margin-top: 8px;
-        }
-        
-        button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4) !important;
-        }
-        
-        /* Links */
-        a {
-            color: #667eea !important;
-            font-weight: 500 !important;
-        }
-        
-        a:hover {
-            color: #764ba2 !important;
-        }
-        
-        /* Error messages */
-        .text-sm.text-red-600 {
-            color: #ef4444 !important;
-            font-size: 13px !important;
-        }
-        
-        @media (max-width: 640px) {
-            .login-card {
-                padding: 32px 24px;
-            }
-            
-            .login-logo {
-                font-size: 28px;
-            }
-        }
-    </style>
+    <div class="min-h-screen bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center px-4 py-10">
+        <!-- Main Container -->
+        <div class="flex w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <!-- Left Side - Brand Section -->
+            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-800 to-slate-900 flex-col items-center justify-center px-12 py-16 relative overflow-hidden">
+                <!-- Decorative Background Elements -->
+                <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-white/5 rounded-full"></div>
+                <div class="absolute top-10 right-10 w-32 h-32 bg-white/5 rounded-full"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full"></div>
 
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-header">
-                <div class="login-logo">AMKas</div>
-                <div class="login-subtitle">Silakan masuk ke akun Anda</div>
+                <!-- Logo Circle -->
+                <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-8 relative z-10 shadow-2xl">
+                    <svg class="w-16 h-16 fill-slate-800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                </div>
+                
+                <!-- Login Title -->
+                <div class="text-white text-6xl font-bold uppercase tracking-[0.3em] relative z-10 mb-4">LOGIN</div>
+                
+                <!-- Subtitle -->
+                <p class="text-slate-300 text-base relative z-10 text-center">Selamat datang kembali di AMKAS</p>
             </div>
 
-            <!-- Session Status -->
-            <x-auth-session-status class="mb-4" :status="session('status')" />
+            <!-- Right Side - Form Section -->
+            <div class="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12 lg:px-12 lg:py-16">
+                <div class="w-full max-w-md">
+                    <!-- Mobile Logo (visible only on mobile) -->
+                    <div class="lg:hidden flex flex-col items-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center mb-4 shadow-xl">
+                            <svg class="w-10 h-10 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 tracking-wider">LOGIN</h2>
+                    </div>
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+                    <!-- Tab Header -->
+                    <div class="flex justify-end mb-10 gap-2">
+                        <button class="px-4 py-2 text-slate-400 text-xs font-semibold uppercase cursor-default transition-all">
+                            ←
+                        </button>
+                        <button class="px-6 py-2 bg-slate-800 text-white text-xs font-semibold uppercase border-none rounded-lg cursor-default shadow-md">
+                            LOGIN
+                        </button>
+                    </div>
 
-                <!-- Email Address -->
-                <div>
-                    <x-input-label for="email" :value="__('Email')" />
-                    <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                </div>
+                    <!-- Session Status -->
+                    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <!-- Password -->
-                <div class="mt-4">
-                    <x-input-label for="password" :value="__('Password')" />
+                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                        @csrf
 
-                    <x-text-input id="password" class="block mt-1 w-full"
+                        <!-- Email Address -->
+                        <div class="relative">
+                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
+                                <div class="w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
+                                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                                    </svg>
+                                </div>
+                                <input
+                                    id="email"
+                                    class="flex-1 border-none px-5 py-4 text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-xs placeholder:tracking-wider focus:ring-0"
+                                    type="email"
+                                    name="email"
+                                    value="{{ old('email') }}"
+                                    required
+                                    autofocus
+                                    autocomplete="username"
+                                    placeholder="EMAIL"
+                                />
+                            </div>
+                            <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs text-red-600" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="relative">
+                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
+                                <div class="w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
+                                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                                    </svg>
+                                </div>
+                                <input
+                                    id="password"
+                                    class="flex-1 border-none px-5 py-4 text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-xs placeholder:tracking-wider focus:ring-0"
                                     type="password"
                                     name="password"
-                                    required autocomplete="current-password" />
+                                    required
+                                    autocomplete="current-password"
+                                    placeholder="PASSWORD"
+                                />
+                            </div>
+                            <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs text-red-600" />
+                        </div>
 
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        <!-- Remember Me & Terms -->
+                        <div class="flex items-start pt-2">
+                            <input 
+                                id="remember_me" 
+                                type="checkbox" 
+                                name="remember" 
+                                class="w-4 h-4 mt-0.5 mr-3 cursor-pointer accent-slate-800 rounded border-slate-300 focus:ring-slate-700"
+                            >
+                            <label for="remember_me" class="text-xs text-slate-600 cursor-pointer select-none leading-relaxed">
+                                I have accepted the terms and conditions
+                            </label>
+                        </div>
+
+                        <!-- Login Button -->
+                        <button 
+                            type="submit" 
+                            class="w-full py-4 bg-slate-800 text-white border-none rounded-xl text-sm font-bold uppercase tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-slate-700 hover:shadow-xl hover:shadow-slate-800/30 active:translate-y-0.5 mt-6"
+                        >
+                            LOGIN
+                        </button>
+
+                        <!-- Forgot Password -->
+                        @if (Route::has('password.request'))
+                            <div class="text-center mt-6">
+                                <a 
+                                    href="{{ route('password.request') }}" 
+                                    class="text-slate-700 text-sm no-underline font-medium hover:text-slate-900 hover:underline transition-all duration-200"
+                                >
+                                    Forgot your password?
+                                </a>
+                            </div>
+                        @endif
+                    </form>
                 </div>
-
-                <!-- Remember Me -->
-                <div class="block mt-4">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                        <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                    </label>
-                </div>
-
-                <div class="flex items-center justify-end mt-4">
-                    @if (Route::has('password.request'))
-                        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                            {{ __('Forgot your password?') }}
-                        </a>
-                    @endif
-
-                    <x-primary-button class="ms-3">
-                        {{ __('Log in') }}
-                    </x-primary-button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </x-guest-layout>

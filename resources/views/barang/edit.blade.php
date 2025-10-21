@@ -38,11 +38,7 @@
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
 
-            <div>
-                <label for="diskon" class="block font-semibold mb-1">Diskon (%):</label>
-                <input id="diskon" type="number" name="diskon" value="{{ old('diskon', $barang->diskon) }}" min="0" max="100"
-                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
+
 
             <div>
                 <label for="stok" class="block font-semibold mb-1">Stok:</label>
@@ -54,10 +50,12 @@
                 <label for="kategori" class="block font-semibold mb-1">Kategori:</label>
                 <select id="kategori" name="kategori"
                     class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="Elektronik" {{ old('kategori', $barang->kategori) == 'Elektronik' ? 'selected' : '' }}>Elektronik</option>
-                    <option value="Pakaian" {{ old('kategori', $barang->kategori) == 'Pakaian' ? 'selected' : '' }}>Pakaian</option>
-                    <option value="Makanan" {{ old('kategori', $barang->kategori) == 'Makanan' ? 'selected' : '' }}>Makanan</option>
-                    <option value="Lainnya" {{ old('kategori', $barang->kategori) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                <option value="Sepeda Pacifik" {{ request('kategori') == 'Sepeda Pacifik' ? 'selected' : '' }}>Sepeda Pacifik</option>
+                <option value="Sepeda Listrik" {{ request('kategori') == 'Sepeda Listrik' ? 'selected' : '' }}>Sepeda Listrik</option>
+                <option value="Ban" {{ request('kategori') == 'Ban' ? 'selected' : '' }}>Ban</option>
+                <option value="Sepeda Stroller" {{ request('kategori') == 'Sepeda Stroller' ? 'selected' : '' }}>Sepeda Stroller</option>
+                <option value="Sparepart" {{ request('kategori') == 'Sparepart' ? 'selected' : '' }}>Sparepart</option>
+                <option value="Lainnya" {{ request('kategori') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                 </select>
             </div>
 

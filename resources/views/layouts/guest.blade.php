@@ -16,17 +16,10 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        
-        <style>
-            body {
-                margin: 0 !important;
-                padding: 0 !important;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                min-height: 100vh;
-            }
-        </style>
+
+
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased m-0 p-0 bg-gradient-to-br from-gray-600 to-gray-800 min-h-screen flex items-center justify-center">
         {{ $slot }}
     </body>
 </html>

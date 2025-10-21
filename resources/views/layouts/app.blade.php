@@ -17,16 +17,20 @@
     <!-- Alpine.js untuk dropdown -->
     <script src="//unpkg.com/alpinejs" defer></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+
     
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
+
 </head>
     <body class="font-sans bg-gradient-to-br from-gray-100 via-gray-200 to-gray-300">
     <!-- Sidebar -->
-    <div class="fixed top-0 left-0 bottom-0 w-64 text-white shadow-xl flex flex-col" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="fixed top-0 left-0 bottom-0 w-64 text-white shadow-xl flex flex-col"
+         style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
         <!-- Header Sidebar -->
         <div class="p-6 text-center border-b border-gray-700" style="border-color: rgba(255, 255, 255, 0.3);">
             <h1 class="text-2xl font-bold tracking-wide">AMKAS</h1>
@@ -40,9 +44,18 @@
             @endphp
 
             <!-- Profile Section -->
-            <div class="mb-6 p-4 rounded-lg shadow-inner bg-purple-500/30">
-                <p class="font-bold text-sm md:text-base mb-1">{{ $user->name }}</p>
-                <p class="text-xs text-gray-200">{{ ucfirst($user->role) }}</p>
+            <div class="mb-6 p-4 rounded-lg shadow-inner bg-blue-500/30">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue/20 rounded-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm md:text-base mb-1">{{ $user->name }}</p>
+                        <p class="text-xs text-gray-200">{{ ucfirst($user->role) }}</p>
+                    </div>
+                </div>
             </div>
 
             <!-- Menu Navigation -->
@@ -219,49 +232,34 @@
         </div>
 
         <!-- Logout Button di Bottom -->
-        <div class="p-4 border-t border-gray-700" x-data="{ showLogoutModal: false }">
-            <button @click="showLogoutModal = true" 
+        <div class="p-4 border-t border-gray-700">
+            <button onclick="confirmLogout()"
                     class="w-full bg-red-600 px-4 py-2 rounded-lg text-white font-semibold hover:bg-red-700 shadow transition">
                 Logout
             </button>
-
-            <!-- Logout Confirmation Modal -->
-            <div x-show="showLogoutModal" x-cloak
-                 class="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
-                 @click.self="showLogoutModal = false" style="display: none;">
-                <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4 z-[10000]">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Logout</h3>
-                    <p class="text-gray-600 mb-6">Apakah Anda yakin ingin logout dari sistem?</p>
-                    <div class="flex justify-end space-x-3">
-                        <button @click="showLogoutModal = false" 
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition">
-                            Batal
-                        </button>
-                        <form method="POST" action="{{ route('logout') }}" class="inline">
-                            @csrf
-                            <button type="submit" 
-                                    class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                                Logout
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            <form id="logout-form" method="POST" action="{{ route('logout') }}" style="display: none;">
+                @csrf
+            </form>
         </div>
     </div>
 
         <!-- Main Content Area -->
-        <div class="ml-64 min-h-screen flex flex-col">
+        <div class="min-h-screen flex flex-col ml-64">
         <!-- Header -->
-        <header class="text-white px-4 md:px-6 py-4 shadow-md sticky top-0 z-30" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <div class="relative flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <h2 class="text-xl font-semibold hidden sm:block">SISTEM AMKAS</h2>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-gray-200 hidden sm:block">
-                        {{ auth()->user()->name }} <span class="text-gray-300">({{ ucfirst(auth()->user()->role) }})</span>
-                    </span>
+        <header class="text-white px-4 md:px-6 py-4 shadow-md sticky top-0 z-30" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
+            <div class="relative flex items-center justify-center">
+                <h2 class="text-xl font-semibold hidden sm:block">SISTEM AMKAS</h2>
+                <div class="absolute right-4 md:right-6 flex items-center space-x-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-200 hidden sm:block">
+                            {{ auth()->user()->name }} <span class="text-gray-300">({{ ucfirst(auth()->user()->role) }})</span>
+                        </span>
+                    </div>
                 </div>
             </div>
         </header>
@@ -278,5 +276,26 @@
             &copy; 2024 <span class="font-semibold text-gray-800">Anugrah Mandiri</span>. All rights reserved.
         </footer>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.confirmLogout = function() {
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: 'Anda akan keluar dari sistem!',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Keluar!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('logout-form').submit();
+                    }
+                });
+            };
+        });
+    </script>
 </body>
 </html>

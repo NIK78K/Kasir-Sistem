@@ -14,8 +14,10 @@ class Transaksi extends Model
         'barang_id',
         'jumlah',
         'harga_barang',
-        'diskon',
+
         'total_harga',
+        'uang_dibayar',
+        'kembalian',
         'tanggal_pembelian',
         'tipe_pembayaran',
         'alamat_pengantaran',

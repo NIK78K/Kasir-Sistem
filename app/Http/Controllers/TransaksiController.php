@@ -41,21 +41,38 @@ class TransaksiController extends Controller
         $request->validate([
             'barang_id' => 'required|exists:barangs,id',
             'jumlah' => 'required|integer|min:1',
-            'tipe_harga' => 'required|in:biasa,grosir',
         ]);
 
         $barang = Barang::findOrFail($request->barang_id);
 
+        // Get customer from session
+        $customerId = session('selected_customer_id');
+        if (!$customerId) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Pilih customer terlebih dahulu'], 400);
+            }
+            return redirect()->route('transaksi.index')->withErrors(['customer' => 'Pilih customer terlebih dahulu']);
+        }
+
+        $customer = Customer::findOrFail($customerId);
+
+        // Auto-determine tipe_harga based on customer type
+        $tipe_harga = 'biasa'; // default
+        if (in_array($customer->tipe_pembeli, ['bengkel', 'langganan'])) {
+            $tipe_harga = 'grosir';
+        }
+
         $cart = session('cart', []);
 
-        // Determine harga based on tipe_harga and apply discount
-        $harga = $request->tipe_harga === 'grosir' ? $barang->harga_grosir : $barang->harga;
-        $harga = $harga * (100 - $barang->diskon) / 100;
+        // Determine harga based on auto-determined tipe_harga
+        $harga = $tipe_harga === 'grosir' ? $barang->harga_grosir : $barang->harga;
 
         // Check if barang with same tipe_harga already in cart
         $found = false;
+        $previousQuantity = 0;
         foreach ($cart as &$item) {
-            if ($item['barang_id'] == $barang->id && $item['tipe_harga'] == $request->tipe_harga) {
+            if ($item['barang_id'] == $barang->id && $item['tipe_harga'] == $tipe_harga) {
+                $previousQuantity = $item['jumlah'];
                 $item['jumlah'] += $request->jumlah;
                 $found = true;
                 break;
@@ -66,17 +83,76 @@ class TransaksiController extends Controller
                 'barang_id' => $barang->id,
                 'nama_barang' => $barang->nama_barang,
                 'harga' => $harga,
-                'tipe_harga' => $request->tipe_harga,
+                'tipe_harga' => $tipe_harga,
                 'jumlah' => $request->jumlah,
             ];
         }
 
         session(['cart' => $cart]);
 
+        // Prepare response data
+        $addedItem = [
+            'nama_barang' => $barang->nama_barang,
+            'jumlah' => $request->jumlah,
+            'harga' => $harga,
+            'tipe_harga' => $tipe_harga,
+            'total_harga' => $harga * $request->jumlah,
+            'previous_quantity' => $previousQuantity,
+            'new_quantity' => $found ? $previousQuantity + $request->jumlah : $request->jumlah,
+        ];
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Barang berhasil ditambahkan ke daftar belanja',
+                'item' => $addedItem,
+                'cart_count' => count($cart)
+            ]);
+        }
+
         // Redirect with selected_customer_id from session to keep customer selected
         $selectedCustomerId = session('selected_customer_id', null);
 
-        return redirect()->route('transaksi.index', ['customer_id' => $selectedCustomerId])->with('success', 'Barang berhasil ditambahkan ke daftar belanja');
+        return redirect()->route('transaksi.index', ['customer_id' => $selectedCustomerId] + (count($cart) > 0 ? ['#daftar-belanja'] : []))->with('success', 'Barang berhasil ditambahkan ke daftar belanja');
+    }
+
+    public function removeFromCart($index)
+    {
+        $cart = session('cart', []);
+        if (isset($cart[$index])) {
+            unset($cart[$index]);
+            $cart = array_values($cart); // Reindex array
+            session(['cart' => $cart]);
+        }
+
+        return redirect()->route('transaksi.index')->with('success', 'Barang berhasil dihapus dari daftar belanja');
+    }
+
+    public function updateCartQuantity(Request $request, $index)
+    {
+        $request->validate([
+            'action' => 'required|in:increase,decrease',
+        ]);
+
+        $cart = session('cart', []);
+        if (!isset($cart[$index])) {
+            return response()->json(['success' => false, 'message' => 'Item tidak ditemukan'], 404);
+        }
+
+        if ($request->action === 'increase') {
+            $cart[$index]['jumlah'] += 1;
+        } elseif ($request->action === 'decrease') {
+            if ($cart[$index]['jumlah'] > 1) {
+                $cart[$index]['jumlah'] -= 1;
+            } else {
+                unset($cart[$index]);
+                $cart = array_values($cart);
+            }
+        }
+
+        session(['cart' => $cart]);
+
+        return response()->json(['success' => true, 'cart' => $cart]);
     }
 
     public function confirmOrder(Request $request)
@@ -84,49 +160,88 @@ class TransaksiController extends Controller
         $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'tipe_pembayaran' => 'required|string',
+            'uang_dibayar' => 'required|numeric|gte:0',
         ]);
 
         $cart = session('cart', []);
         if (empty($cart)) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Daftar belanja kosong'], 400);
+            }
             return redirect()->route('transaksi.index')->withErrors(['cart' => 'Daftar belanja kosong']);
         }
 
         $customer = Customer::findOrFail($request->customer_id);
 
-        $orderIds = [];
-        DB::transaction(function () use ($cart, $customer, $request, &$orderIds) {
-            foreach ($cart as $item) {
-                $barang = Barang::findOrFail($item['barang_id']);
-                if ($barang->stok < $item['jumlah']) {
-                    throw new \Exception("Stok barang {$barang->nama_barang} tidak cukup");
-                }
+        // Calculate total
+        $total = 0;
+        foreach ($cart as $item) {
+            $total += $item['harga'] * $item['jumlah'];
+        }
 
-                $total_harga = $item['harga'] * $item['jumlah'];
-
-                $barangModel = Barang::findOrFail($item['barang_id']);
-                $transaksi = Transaksi::create([
-                    'customer_id' => $customer->id,
-                    'barang_id' => $barang->id,
-                    'jumlah' => $item['jumlah'],
-                    'harga_barang' => $item['harga'],
-                    'diskon' => $barangModel->diskon,
-                    'total_harga' => $total_harga,
-                    'tanggal_pembelian' => now(),
-                    'tipe_pembayaran' => $request->tipe_pembayaran,
-                    'alamat_pengantaran' => $customer->alamat,
-                    'status' => 'selesai',
-                ]);
-
-                $orderIds[] = $transaksi->id;
-
-                $barang->decrement('stok', $item['jumlah']);
+        // Check if uang_dibayar is sufficient
+        $uang_dibayar = $request->uang_dibayar;
+        if ($uang_dibayar < $total) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => 'Uang yang dibayar tidak cukup. Total yang harus dibayar: Rp ' . number_format($total, 0, ',', '.')]);
             }
-        });
+            return redirect()->back()->withErrors(['uang_dibayar' => 'Uang yang dibayar tidak cukup. Total yang harus dibayar: Rp ' . number_format($total, 0, ',', '.')]);
+        }
 
-        session(['last_order_ids' => $orderIds]);
-        session()->forget('cart');
+        // Calculate change
+        $kembalian = $uang_dibayar - $total;
 
-        return redirect()->route('transaksi.confirm')->with('success', 'Pesanan berhasil dikonfirmasi');
+        try {
+            $orderIds = [];
+            DB::transaction(function () use ($cart, $customer, $request, $uang_dibayar, $kembalian, &$orderIds) {
+                foreach ($cart as $item) {
+                    $barang = Barang::findOrFail($item['barang_id']);
+                    if ($barang->stok < $item['jumlah']) {
+                        throw new \Exception("Stok barang {$barang->nama_barang} tidak cukup");
+                    }
+
+                    $total_harga = $item['harga'] * $item['jumlah'];
+
+                    $barangModel = Barang::findOrFail($item['barang_id']);
+                    $transaksi = Transaksi::create([
+                        'customer_id' => $customer->id,
+                        'barang_id' => $barang->id,
+                        'jumlah' => $item['jumlah'],
+                        'harga_barang' => $item['harga'],
+
+                        'total_harga' => $total_harga,
+                        'uang_dibayar' => $uang_dibayar,
+                        'kembalian' => $kembalian,
+                        'tanggal_pembelian' => now(),
+                        'tipe_pembayaran' => $request->tipe_pembayaran,
+                        'alamat_pengantaran' => $customer->alamat,
+                        'status' => 'selesai',
+                    ]);
+
+                    $orderIds[] = $transaksi->id;
+
+                    $barang->decrement('stok', $item['jumlah']);
+                }
+            });
+
+            session(['last_order_ids' => $orderIds]);
+            session()->forget('cart');
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Pesanan berhasil dikonfirmasi',
+                    'redirect' => route('transaksi.confirm')
+                ]);
+            }
+
+            return redirect()->route('transaksi.confirm')->with('success', 'Pesanan berhasil dikonfirmasi');
+        } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 400);
+            }
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
     }
 
     public function confirm()
@@ -175,7 +290,6 @@ class TransaksiController extends Controller
             'customer_id' => 'required|exists:customers,id',
             'barang_id' => 'required|exists:barangs,id',
             'jumlah' => 'required|integer|min:1',
-            'diskon' => 'nullable|numeric|min:0|max:100',
             'tipe_pembayaran' => 'required|string',
             'tanggal_pembelian' => 'required|date',
             'alamat_pengantaran' => 'nullable|string',
@@ -193,9 +307,8 @@ class TransaksiController extends Controller
         DB::transaction(function () use ($request, $barang) {
             $harga_barang = $barang->harga;
             $jumlah = $request->jumlah;
-            $diskon = $request->diskon ?? 0;
 
-            $total_harga = $harga_barang * $jumlah * (1 - $diskon / 100);
+            $total_harga = $harga_barang * $jumlah;
 
             // Simpan transaksi
             Transaksi::create([
@@ -203,7 +316,7 @@ class TransaksiController extends Controller
                 'barang_id' => $request->barang_id,
                 'jumlah' => $jumlah,
                 'harga_barang' => $harga_barang,
-                'diskon' => $diskon,
+
                 'total_harga' => $total_harga,
                 'tanggal_pembelian' => $request->tanggal_pembelian,
                 'tipe_pembayaran' => $request->tipe_pembayaran,

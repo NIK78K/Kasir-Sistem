@@ -5,7 +5,7 @@
 @section('content')
     <div class="max-w-6xl mx-auto p-6">
         {{-- Banner Selamat Datang --}}
-        <div class="mb-8 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 p-6 shadow-lg">
+        <div class="mb-8 rounded-2xl p-6 shadow-lg" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
             <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
@@ -19,7 +19,7 @@
         {{-- Tombol Tambah --}}
         <div class="mb-6 flex justify-end">
             <a href="{{ route('customer.create') }}"
-                class="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition flex items-center gap-2 font-semibold">
+                class="px-5 py-2.5 bg-gray-600 text-white rounded-lg shadow-md hover:bg-gray-700 transition flex items-center gap-2 font-semibold">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -30,7 +30,7 @@
 
         {{-- Alert --}}
         @if (session('success'))
-            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow">
+            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow" id="success-alert">
                 ✅ {{ session('success') }}
             </div>
         @endif
@@ -71,14 +71,14 @@
                                     </a>
 
                                     {{-- Tombol Hapus --}}
-                                    <form action="{{ route('customer.destroy', $customer->id) }}" method="POST"
-                                        onsubmit="return confirm('Yakin hapus data ini?')">
+                                    <button type="button"
+                                            onclick="confirmDeleteCustomer({{ $customer->id }}, '{{ $customer->nama_customer }}')"
+                                            class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-xs">
+                                        Hapus
+                                    </button>
+                                    <form id="delete-form-{{ $customer->id }}" action="{{ route('customer.destroy', $customer->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit"
-                                            class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-xs">
-                                            Hapus
-                                        </button>
                                     </form>
                                 </div>
                             </td>
@@ -117,14 +117,14 @@
                             class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-sm hover:bg-blue-700 transition font-semibold text-center text-sm">
                             Edit
                         </a>
-                        <form action="{{ route('customer.destroy', $customer->id) }}" method="POST"
-                            onsubmit="return confirm('Yakin hapus data ini?')" class="flex-1">
+                        <button type="button"
+                                onclick="confirmDeleteCustomer({{ $customer->id }}, '{{ $customer->nama_customer }}')"
+                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-sm">
+                            Hapus
+                        </button>
+                        <form id="delete-form-mobile-{{ $customer->id }}" action="{{ route('customer.destroy', $customer->id) }}" method="POST" style="display: none;">
                             @csrf
                             @method('DELETE')
-                            <button type="submit"
-                                class="w-full px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-sm">
-                                Hapus
-                            </button>
                         </form>
                     </div>
                 </div>
@@ -138,4 +138,36 @@
             @endif
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const successAlert = document.getElementById('success-alert');
+            if (successAlert) {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    icon: 'success',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
+        function confirmDeleteCustomer(id, namaCustomer) {
+            Swal.fire({
+                title: 'Apakah Anda yakin menghapus customer?',
+                text: `Customer "${namaCustomer}" akan dihapus secara permanen!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+    </script>
 @endsection

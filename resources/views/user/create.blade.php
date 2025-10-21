@@ -3,11 +3,11 @@
 @section('title', 'Tambah User')
 
 @section('content')
-    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-semibold mb-6 text-gray-800">Tambah User</h1>
+    <div class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6">Tambah User</h1>
 
         @if ($errors->any())
-            <div class="mb-4 p-4 rounded bg-red-100 text-red-700">
+            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -16,56 +16,56 @@
             </div>
         @endif
 
-        <form action="{{ route('user.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('user.store') }}" method="POST" class="space-y-6">
             @csrf
 
             <div>
-                <label class="block font-medium text-gray-700">Nama</label>
-                <input type="text" name="name" value="{{ old('name') }}"
-                       class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-                       placeholder="Masukkan nama user" required>
+                <label for="name" class="block font-semibold mb-1">Nama:</label>
+                <input id="name" type="text" name="name" value="{{ old('name') }}"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Masukkan nama user" required />
             </div>
 
             <div>
-                <label class="block font-medium text-gray-700">Email</label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                       class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-                       placeholder="Masukkan email" required>
+                <label for="email" class="block font-semibold mb-1">Email:</label>
+                <input id="email" type="email" name="email" value="{{ old('email') }}"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Masukkan email" required />
             </div>
 
             <div>
-                <label class="block font-medium text-gray-700">Password</label>
-                <input type="password" name="password"
-                       class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-                       placeholder="Masukkan password" required>
+                <label for="password" class="block font-semibold mb-1">Password:</label>
+                <input id="password" type="password" name="password"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Masukkan password" required />
             </div>
 
             <div>
-                <label class="block font-medium text-gray-700">Konfirmasi Password</label>
-                <input type="password" name="password_confirmation"
-                       class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none"
-                       placeholder="Konfirmasi password" required>
+                <label for="password_confirmation" class="block font-semibold mb-1">Konfirmasi Password:</label>
+                <input id="password_confirmation" type="password" name="password_confirmation"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Konfirmasi password" required />
             </div>
 
             <div>
-                <label class="block font-medium text-gray-700">Role</label>
-                <select name="role"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300 focus:outline-none" required>
-                    <option value="kasir" {{ old('role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
-                    <option value="owner" {{ old('role') == 'owner' ? 'selected' : '' }}>Owner</option>
+                <label for="role" class="block font-semibold mb-1">Role:</label>
+                <select id="role" name="role"
+                    class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="kasir" {{ old('role') == 'kasir' ? 'selected' : '' }}>Kasir</option>
+                <option value="owner" {{ old('role') == 'owner' ? 'selected' : '' }}>Owner</option>
                 </select>
             </div>
 
-            <div class="flex justify-between items-center">
-                <a href="{{ route('user.index') }}"
-                   class="px-4 py-2 bg-gray-500 text-white rounded-lg shadow hover:bg-gray-600 transition">
-                    Batal
-                </a>
+            <div>
                 <button type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                    class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition">
                     Simpan
                 </button>
             </div>
         </form>
+
+        <div class="mt-4 text-center">
+            <a href="{{ route('user.index') }}" class="text-blue-600 hover:underline">Kembali</a>
+        </div>
     </div>
 @endsection

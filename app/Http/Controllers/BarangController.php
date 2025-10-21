@@ -37,11 +37,10 @@ class BarangController extends Controller
             'harga_grosir' => 'required_without:harga|nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|string|max:255',
-            'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori', 'diskon');
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
 
         // Convert empty strings to null for nullable fields
         $data['harga'] = $data['harga'] ?: null;
@@ -70,11 +69,10 @@ class BarangController extends Controller
             'harga_grosir' => 'required_without:harga|nullable|integer|min:0',
             'stok' => 'required|integer|min:0',
             'kategori' => 'required|string|max:255',
-            'diskon' => 'nullable|integer|min:0|max:100',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori', 'diskon');
+        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
 
         // Convert empty strings to null for nullable fields
         $data['harga'] = $data['harga'] ?: null;
