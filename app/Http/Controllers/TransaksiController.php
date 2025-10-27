@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiController extends Controller
@@ -408,18 +409,40 @@ class TransaksiController extends Controller
                     if ($barang) {
                         $barang->increment('stok', $jumlahReturn);
                     }
-                    // Update status based on return quantity
+                    // Update status and handle partial/full return
                     if ($jumlahReturn == $transaksi->jumlah) {
+                        // Full return
                         $transaksi->status = 'return';
+                        $transaksi->save();
                     } else {
+                        // Partial return: create new transaction for remaining quantity
+                        $remaining = $transaksi->jumlah - $jumlahReturn;
+                        Transaksi::create([
+                            'customer_id' => $transaksi->customer_id,
+                            'barang_id' => $transaksi->barang_id,
+                            'jumlah' => $remaining,
+                            'harga_barang' => $transaksi->harga_barang,
+                            'total_harga' => $transaksi->harga_barang * $remaining,
+                            'uang_dibayar' => $transaksi->uang_dibayar,
+                            'kembalian' => $transaksi->kembalian,
+                            'tanggal_pembelian' => $transaksi->tanggal_pembelian,
+                            'tipe_pembayaran' => $transaksi->tipe_pembayaran,
+                            'alamat_pengantaran' => $transaksi->alamat_pengantaran,
+                            'status' => 'selesai',
+                        ]);
+                        // Update original transaction for returned quantity
+                        $transaksi->jumlah = $jumlahReturn;
+                        $transaksi->total_harga = $transaksi->harga_barang * $jumlahReturn;
                         $transaksi->status = 'return_partial';
+                        $transaksi->save();
                     }
-                    $transaksi->save();
                 }
             }
             // Save alasan return if needed (not stored in current schema)
         });
 
-        return redirect()->route('transaksi.barangReturn', ['id' => $transaksi->id])->with('success', 'Barang berhasil dikembalikan');
+        $user = Auth::user();
+        $redirectRoute = $user && $user->role == 'owner' ? 'owner.laporanBarangReturn' : 'transaksi.listReturnable';
+        return redirect()->route($redirectRoute)->with('success', 'Barang berhasil dikembalikan');
     }
 }

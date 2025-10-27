@@ -9,19 +9,79 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Carbon\Carbon;
 
-class LaporanPenjualanExport implements 
-    FromCollection, 
-    WithHeadings, 
+class LaporanPenjualanExport implements WithMultipleSheets
+{
+    /**
+     * Mengembalikan array of sheets untuk setiap bulan
+     *
+     * @return array
+     */
+    public function sheets(): array
+    {
+        $sheets = [];
+
+        // Ambil 12 bulan terakhir
+        for ($i = 11; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $year = $date->year;
+            $month = $date->month;
+
+            // Cek apakah ada data untuk bulan ini
+            $hasData = Transaksi::whereYear('tanggal_pembelian', $year)
+                ->whereMonth('tanggal_pembelian', $month)
+                ->where('status', 'selesai')
+                ->exists();
+
+            if ($hasData) {
+                $sheets[] = new LaporanPenjualanPerBulanSheet($year, $month);
+            }
+        }
+
+        // Jika tidak ada data di 12 bulan terakhir, buat sheet kosong untuk bulan current
+        if (empty($sheets)) {
+            $currentDate = Carbon::now();
+            $sheets[] = new LaporanPenjualanPerBulanSheet($currentDate->year, $currentDate->month);
+        }
+
+        return $sheets;
+    }
+}
+
+class LaporanPenjualanPerBulanSheet implements
+    FromCollection,
+    WithHeadings,
     WithMapping,
     WithColumnFormatting,
     WithStyles,
-    ShouldAutoSize
+    ShouldAutoSize,
+    WithTitle
 {
+    private $year;
+    private $month;
+
+    public function __construct($year, $month)
+    {
+        $this->year = $year;
+        $this->month = $month;
+    }
+
     /**
-     * Mengambil data transaksi yang sudah selesai
+     * Nama sheet berdasarkan bulan dan tahun
+     *
+     * @return string
+     */
+    public function title(): string
+    {
+        return Carbon::createFromDate($this->year, $this->month, 1)->format('M Y');
+    }
+    /**
+     * Mengambil data transaksi yang sudah selesai untuk bulan tertentu
      *
      * @return \Illuminate\Support\Collection
      */
@@ -29,6 +89,8 @@ class LaporanPenjualanExport implements
     {
         return Transaksi::with(['barang', 'customer'])
             ->where('status', 'selesai')
+            ->whereYear('tanggal_pembelian', $this->year)
+            ->whereMonth('tanggal_pembelian', $this->month)
             ->orderBy('tanggal_pembelian', 'desc')
             ->get();
     }
@@ -44,6 +106,7 @@ class LaporanPenjualanExport implements
         return [
             $transaksi->id,
             $transaksi->customer->nama_customer ?? '-',
+            $transaksi->customer->tipe_pembeli ?? '-',
             $transaksi->barang->nama_barang ?? '-',
             $transaksi->jumlah,
             $transaksi->harga_barang,
@@ -64,6 +127,7 @@ class LaporanPenjualanExport implements
         return [
             'ID',
             'Nama Pembeli',
+            'Tipe Pembeli',
             'Nama Barang',
             'Jumlah',
             'Harga Barang',
@@ -82,8 +146,8 @@ class LaporanPenjualanExport implements
     public function columnFormats(): array
     {
         return [
-            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Harga Barang
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Harga
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Harga Barang
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Harga
         ];
     }
 

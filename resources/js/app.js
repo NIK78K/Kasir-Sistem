@@ -1,10 +1,17 @@
 import './bootstrap';
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 
 import Alpine from 'alpinejs';
 
+import ApexCharts from 'apexcharts';
+
 window.Alpine = Alpine;
+window.ApexCharts = ApexCharts;
 
 Alpine.start();
+
+
 
 // Transaction page functionality
 document.addEventListener('DOMContentLoaded', function() {

@@ -1,5 +1,4 @@
 <x-guest-layout>
-    <div class="min-h-screen bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center px-4 py-10">
         <!-- Main Container -->
         <div class="flex w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
             <!-- Left Side - Brand Section -->
@@ -132,5 +131,4 @@
                 </div>
             </div>
         </div>
-    </div>
 </x-guest-layout>

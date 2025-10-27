@@ -4,8 +4,8 @@
 
 @section('content')
     <div class="max-w-6xl mx-auto p-6">
-        {{-- Banner Selamat Datang --}}
-        <div class="mb-8 rounded-2xl p-6 shadow-lg" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
+    {{-- Banner Selamat Datang --}}
+        <div class="mb-8 rounded-2xl p-6 shadow-lg bg-gray-700">
             <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">

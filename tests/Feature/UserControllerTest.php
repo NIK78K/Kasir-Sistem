@@ -193,7 +193,7 @@ class UserControllerTest extends TestCase
         $this->actingAs($authenticatedUser);
 
         $user = User::factory()->create();
-
+  
         $response = $this->delete(route('user.destroy', $user->id));
 
         $response->assertRedirect(route('user.index'));

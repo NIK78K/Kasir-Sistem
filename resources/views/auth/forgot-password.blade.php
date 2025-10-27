@@ -1,17 +1,16 @@
 <x-guest-layout>
-    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-md w-full">
             <!-- Card Container -->
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <!-- Header Section -->
-                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-10 text-center">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-10 text-center">
                     <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 shadow-lg">
-                        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-slate-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                         </svg>
                     </div>
                     <h2 class="text-3xl font-bold text-white mb-2">Lupa Password?</h2>
-                    <p class="text-indigo-100 text-sm">Jangan khawatir, kami akan bantu Anda</p>
+                    <p class="text-slate-100 text-sm">Jangan khawatir, kami akan bantu Anda</p>
                 </div>
 
                 <!-- Content Section -->
@@ -51,7 +50,7 @@
                                     value="{{ old('email') }}"
                                     required 
                                     autofocus
-                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm"
+                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent transition duration-150 ease-in-out sm:text-sm"
                                     placeholder="nama@email.com"
                                 />
                             </div>
@@ -60,9 +59,9 @@
 
                         <!-- Submit Button -->
                         <div>
-                            <button 
-                                type="submit" 
-                                class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out transform hover:scale-[1.02]"
+                            <button
+                                type="submit"
+                                class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition duration-150 ease-in-out transform hover:scale-[1.02]"
                             >
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -73,7 +72,7 @@
 
                         <!-- Back to Login -->
                         <div class="text-center pt-4 border-t border-gray-100">
-                            <a href="{{ route('login') }}" class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out">
+                            <a href="{{ route('login') }}" class="inline-flex items-center text-sm font-medium text-slate-700 hover:text-slate-900 transition duration-150 ease-in-out">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                                 </svg>
@@ -87,10 +86,9 @@
             <!-- Footer Info -->
             <div class="mt-6 text-center">
                 <p class="text-sm text-gray-500">
-                    Butuh bantuan? 
-                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">Hubungi Support</a>
+                    Sistem Kasir
+                    <a href="#" class="font-medium text-slate-700 hover:text-slate-900">AMKAS</a>
                 </p>
             </div>
         </div>
-    </div>
 </x-guest-layout>

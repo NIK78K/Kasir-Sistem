@@ -40,61 +40,159 @@
             </form>
         </div>
     @elseif(isset($transaksis))
-        @if(auth()->user()->role == 'owner')
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold">Laporan Penjualan</h3>
-                <a href="{{ route('owner.laporanPenjualanExport') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Export to Excel
-                </a>
+        <div class="max-w-6xl mx-auto p-6">
+            {{-- Banner Selamat Datang --}}
+            <div class="mb-8 rounded-2xl p-6 shadow-lg bg-gray-700">
+                <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    @if(auth()->user()->role == 'owner')
+                        Laporan Penjualan
+                    @else
+                        Transaksi Batal
+                    @endif
+                </h1>
             </div>
-        @else
-            <h3 class="mb-4 text-lg font-semibold">Transaksi yang ingin dibatalkan</h3>
-        @endif
-        <div class="overflow-x-auto">
-            <table class="min-w-full border border-gray-300 divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">ID</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Nama Pembeli</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Nama Barang</th>
-                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Jumlah</th>
-                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Harga Barang</th>
 
-                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Total Harga</th>
-                        <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Tanggal Pembelian</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Tipe Pembayaran</th>
-                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Alamat Pengantaran</th>
-                        @if(auth()->user()->role != 'owner')
-                            <th class="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase border-b border-gray-300">Aksi</th>
-                        @endif
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($transaksis as $transaksi)
-                        <tr class="hover:bg-gray-100">
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->id }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->customer->nama_customer }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->barang->nama_barang }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->jumlah }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm text-gray-700 border-b border-gray-300">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+            {{-- Tombol Export untuk Owner --}}
+            @if(auth()->user()->role == 'owner')
+                <div class="mb-6 flex justify-end">
+                    <a href="{{ route('owner.laporanPenjualanExport') }}"
+                        class="px-5 py-2.5 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition flex items-center gap-2 font-semibold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export to Excel
+                    </a>
+                </div>
+            @endif
 
-                            <td class="px-4 py-2 whitespace-nowrap text-right text-sm text-gray-700 border-b border-gray-300">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->tanggal_pembelian->format('d-m-Y') }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ ucfirst($transaksi->tipe_pembayaran) }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-700 border-b border-gray-300">{{ $transaksi->alamat_pengantaran }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-center text-sm border-b border-gray-300 space-x-2">
-                                @if(auth()->user()->role != 'owner')
-                                    <a href="{{ route('transaksi.listBatal', ['id' => $transaksi->id]) }}" class="text-blue-600 hover:underline">Batalkan</a>
-                                @endif
-                            </td>
+            {{-- Alert --}}
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow" id="success-alert">
+                    ✅ {{ session('success') }}
+                </div>
+            @endif
+
+            {{-- Table for Desktop --}}
+            <div class="hidden md:block overflow-x-auto bg-white shadow-lg rounded-xl border border-gray-200">
+                <table class="min-w-full text-sm text-gray-700">
+                    <thead class="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-300">
+                        <tr>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">ID</th>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">Nama Pembeli</th>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">Tipe Pembeli</th>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">Nama Barang</th>
+                            <th class="py-4 px-4 text-center font-semibold text-gray-800">Jumlah</th>
+                            <th class="py-4 px-4 text-right font-semibold text-gray-800">Harga Barang</th>
+                            <th class="py-4 px-4 text-right font-semibold text-gray-800">Total Harga</th>
+                            <th class="py-4 px-4 text-center font-semibold text-gray-800">Tanggal Pembelian</th>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">Tipe Pembayaran</th>
+                            <th class="py-4 px-4 text-left font-semibold text-gray-800">Alamat Pengantaran</th>
+                            @if(auth()->user()->role != 'owner')
+                                <th class="py-4 px-4 text-center font-semibold text-gray-800">Aksi</th>
+                            @endif
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        @foreach ($transaksis as $transaksi)
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="py-4 px-4">{{ $transaksi->id }}</td>
+                                <td class="py-4 px-4 font-medium text-gray-900">{{ $transaksi->customer->nama_customer }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full {{ ($transaksi->customer->tipe_pembeli ?? '') == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                                        {{ ucfirst($transaksi->customer->tipe_pembeli ?? '-') }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4">{{ $transaksi->barang->nama_barang }}</td>
+                                <td class="py-4 px-4 text-center">{{ $transaksi->jumlah }}</td>
+                                <td class="py-4 px-4 text-right">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+                                <td class="py-4 px-4 text-right font-bold text-blue-600">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
+                                <td class="py-4 px-4 text-center">{{ $transaksi->tanggal_pembelian->format('d-m-Y') }}</td>
+                                <td class="py-4 px-4">
+                                    <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                        {{ $transaksi->tipe_pembayaran == 'cash' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">
+                                        {{ ucfirst($transaksi->tipe_pembayaran) }}
+                                    </span>
+                                </td>
+                                <td class="py-4 px-4">{{ $transaksi->alamat_pengantaran }}</td>
+                                @if(auth()->user()->role != 'owner')
+                                    <td class="py-4 px-4 text-center">
+                                        <a href="{{ route('transaksi.listBatal', ['id' => $transaksi->id]) }}"
+                                            class="px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-xs">
+                                            Batalkan
+                                        </a>
+                                    </td>
+                                @endif
+                            </tr>
+                        @endforeach
 
-        <div class="mt-4">
-            {{ $transaksis->links() }}
+                        {{-- Jika kosong --}}
+                        @if ($transaksis->isEmpty())
+                            <tr>
+                                <td colspan="{{ auth()->user()->role != 'owner' ? '10' : '9' }}" class="py-8 text-center text-gray-500">
+                                    Belum ada data transaksi.
+                                </td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Cards for Mobile --}}
+            <div class="block md:hidden space-y-4">
+                @foreach ($transaksis as $transaksi)
+                    <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-lg font-bold text-gray-900">{{ $transaksi->customer->nama_customer }}</h3>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $transaksi->tipe_pembayaran == 'cash' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' }}">
+                                {{ ucfirst($transaksi->tipe_pembayaran) }}
+                            </span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <p><strong>ID:</strong> {{ $transaksi->id }}</p>
+                            <p><strong>Tipe Pembeli:</strong>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($transaksi->customer->tipe_pembeli ?? '') == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                                    {{ ucfirst($transaksi->customer->tipe_pembeli ?? '-') }}
+                                </span>
+                            </p>
+                            <p><strong>Barang:</strong> {{ $transaksi->barang->nama_barang }}</p>
+                            <p><strong>Jumlah:</strong> {{ $transaksi->jumlah }}</p>
+                            <p><strong>Harga Barang:</strong> Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</p>
+                            <p><strong>Total Harga:</strong> <span class="font-bold text-blue-600">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</span></p>
+                            <p><strong>Tanggal:</strong> {{ $transaksi->tanggal_pembelian->format('d-m-Y') }}</p>
+                            <p><strong>Alamat:</strong> {{ $transaksi->alamat_pengantaran }}</p>
+                        </div>
+                        @if(auth()->user()->role != 'owner')
+                            <div class="mt-4">
+                                <a href="{{ route('transaksi.listBatal', ['id' => $transaksi->id]) }}"
+                                    class="w-full px-4 py-2 bg-red-600 text-white rounded-lg shadow-sm hover:bg-red-700 transition font-semibold text-center text-sm">
+                                    Batalkan Transaksi
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+
+                {{-- Jika kosong --}}
+                @if ($transaksis->isEmpty())
+                    <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+                        Belum ada data transaksi.
+                    </div>
+                @endif
+            </div>
+
+            {{-- Pagination --}}
+            @if($transaksis->hasPages())
+                <div class="mt-6">
+                    {{ $transaksis->links() }}
+                </div>
+            @endif
         </div>
     @endif
 

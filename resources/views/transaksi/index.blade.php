@@ -5,7 +5,7 @@
 @section('content')
     <div class="max-w-7xl mx-auto p-6">
         {{-- Banner Header --}}
-        <div class="mb-8 rounded-2xl p-6 shadow-lg" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
+        <div class="mb-8 rounded-2xl p-6 shadow-lg bg-gray-700">
             <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -166,16 +166,15 @@
                     </svg>
                     Daftar Barang
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @foreach ($barangs as $barang)
                         <div
-                            class="border rounded-xl p-6 flex flex-col space-y-4 shadow-md hover:shadow-2xl transition-all duration-300 bg-white hover:-translate-y-2 hover:scale-105 group">
+                            class="border rounded-xl p-5 flex flex-col space-y-4 shadow-md hover:shadow-2xl transition-all duration-300 bg-white hover:-translate-y-2 hover:scale-105 group">
                             <div
-                                class="w-full h-48 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative">
+                                class="w-full h-40 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center relative">
                                 @if ($barang->gambar)
                                     <img src="{{ asset('storage/' . $barang->gambar) }}"
-                                        alt="{{ $barang->nama_barang }}"
-                                        class="object-cover w-full h-full" />
+                                        alt="{{ $barang->nama_barang }}" class="object-cover w-full h-full" />
                                 @else
                                     <span class="text-gray-400 italic">No Image</span>
                                 @endif
@@ -188,28 +187,29 @@
                             </div>
                             <div class="flex-grow flex flex-col justify-between">
                                 <div class="space-y-2">
-                                    <p class="text-lg font-bold text-gray-900 line-clamp-2">
+                                    <p class="text-base font-bold text-gray-900 line-clamp-2">
                                         {{ $barang->nama_barang }}</p>
-                                    @if($barang->harga_grosir)
-                                        <p class="text-sm text-gray-600"><span class="font-semibold">Harga Grosir & Bengkel:</span>
-                                            <span class="text-blue-600">Rp {{ number_format($barang->harga_grosir, 0, ',', '.') }}</span>
+                                    @if ($barang->harga_grosir)
+                                        <p class="text-sm text-gray-600"><span class="font-semibold">Grosir:</span>
+                                            <span class="text-blue-600">Rp
+                                                {{ number_format($barang->harga_grosir, 0, ',', '.') }}</span>
                                         </p>
                                     @else
-                                        <p class="text-sm text-gray-400"><span class="font-semibold">Harga Grosir & Bengkel:</span> -</p>
+                                        <p class="text-sm text-gray-400"><span class="font-semibold">Grosir:</span> -</p>
                                     @endif
-                                    @if($barang->harga)
+                                    @if ($barang->harga)
                                         <p class="text-sm text-gray-600"><span class="font-semibold">Harga:</span>
-                                            <span class="text-green-600">Rp {{ number_format($barang->harga, 0, ',', '.') }}</span>
+                                            <span class="text-green-600">Rp
+                                                {{ number_format($barang->harga, 0, ',', '.') }}</span>
                                         </p>
                                     @else
                                         <p class="text-sm text-gray-400"><span class="font-semibold">Harga:</span> -</p>
                                     @endif
-                                    <p class="text-sm text-gray-600"><span
-                                            class="font-semibold">Stok:</span> <span
+                                    <p class="text-sm text-gray-600"><span class="font-semibold">Stok:</span> <span
                                             class="text-green-600 font-semibold">{{ $barang->stok }}</span>
                                     </p>
-                                    <p class="text-sm text-gray-600"><span
-                                            class="font-semibold">Kategori:</span> {{ $barang->kategori }}</p>
+                                    <p class="text-sm text-gray-600"><span class="font-semibold">Kategori:</span>
+                                        {{ $barang->kategori }}</p>
                                 </div>
                                 <div class="mt-4">
                                     <form method="POST" action="{{ route('transaksi.addToCart') }}" class="space-y-3">
@@ -319,10 +319,9 @@
                                             <button type="button"
                                                 class="bg-gray-500 text-white w-8 h-8 flex items-center justify-center rounded text-sm hover:bg-gray-600 remove-item-btn"
                                                 data-index="{{ $index }}">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
                                             </button>
@@ -363,7 +362,7 @@
 
 {{-- Modal Konfirmasi Pembayaran --}}
 <x-modal name="payment-confirmation-modal" :show="false">
-    <div class="p-6 max-h-96 overflow-y-auto">
+    <div class="p-6">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600" fill="none"
@@ -384,89 +383,145 @@
 
         {{-- Daftar Item --}}
         <div class="mb-6">
-            <h4 class="text-md font-semibold text-gray-800 mb-3">Daftar Barang</h4>
             <div class="overflow-x-auto">
-                <table class="w-full border-collapse border border-gray-300">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="border border-gray-300 px-3 py-2 text-left text-sm font-semibold">Barang</th>
-                            <th class="border border-gray-300 px-3 py-2 text-center text-sm font-semibold">Jumlah</th>
-                            <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold">Harga</th>
-                            <th class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php $modalTotal = 0; @endphp
-                        @foreach (session('cart', []) as $item)
-                            @php
-                                $itemTotal = $item['harga'] * $item['jumlah'];
-                                $modalTotal += $itemTotal;
-                            @endphp
-                            <tr>
-                                <td class="border border-gray-300 px-3 py-2 text-sm">{{ $item['nama_barang'] }}
-                                    ({{ ucfirst($item['tipe_harga']) }})</td>
-                                <td class="border border-gray-300 px-3 py-2 text-center text-sm">{{ $item['jumlah'] }}
-                                </td>
-                                <td class="border border-gray-300 px-3 py-2 text-right text-sm">Rp
-                                    {{ number_format($item['harga'], 0, ',', '.') }}</td>
-                                <td class="border border-gray-300 px-3 py-2 text-right text-sm font-semibold">Rp
-                                    {{ number_format($itemTotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                    <tfoot>
-                        <tr class="bg-gray-50">
-                            <td colspan="3" class="border border-gray-300 px-3 py-2 text-right font-semibold">Total
-                                Pembayaran</td>
-                            <td class="border border-gray-300 px-3 py-2 text-right font-bold text-blue-600">Rp
-                                {{ number_format($modalTotal, 0, ',', '.') }}</td>
-                        </tr>
-                    </tfoot>
+                <tbody>
+                    @php $modalTotal = 0; @endphp
+                    @foreach (session('cart', []) as $item)
+                        @php
+                            $itemTotal = $item['harga'] * $item['jumlah'];
+                            $modalTotal += $itemTotal;
+                        @endphp
+                    @endforeach
+                </tbody>
                 </table>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('transaksi.confirmOrder') }}" id="payment-form" onsubmit="handlePaymentSubmit(event)">
+        <form method="POST" action="{{ route('transaksi.confirmOrder') }}" id="payment-form"
+            onsubmit="handlePaymentSubmit(event)">
             @csrf
             <input type="hidden" name="customer_id" value="{{ $customer->id ?? '' }}" />
 
-            <div class="mb-6">
-                <label for="modal-tipe_pembayaran" class="block text-sm font-medium text-gray-700 mb-2">Tipe
-                    Pembayaran</label>
+            <!-- Total Belanja & Kembalian Section -->
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <!-- Total Belanja -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-5 text-white shadow-lg">
+                    <div class="text-xs font-medium opacity-90 mb-1">Total Belanja</div>
+                    <div class="text-2xl font-bold" id="modal-total-belanja">Rp 0</div>
+                </div>
+
+                <!-- Kembalian -->
+                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-5 text-white shadow-lg">
+                    <div class="text-xs font-medium opacity-90 mb-1">Kembalian</div>
+                    <div class="text-2xl font-bold" id="modal-kembalian">Rp 0</div>
+                </div>
+            </div>
+
+            <!-- Nama Customer -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Nama Customer</span>
+                    <span class="text-sm font-medium text-gray-900"
+                        id="modal-nama-customer">{{ $customer->nama_customer ?? 'Umum' }}</span>
+                </div>
+            </div>
+
+            <!-- Nominal Bayar -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-600">Nominal Bayar</span>
+                    <span class="text-sm font-medium text-gray-900" id="modal-nominal-bayar">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Metode Pembayaran -->
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-2">Metode Pembayaran</label>
                 <select name="tipe_pembayaran" id="modal-tipe_pembayaran"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition bg-white font-medium"
-                    required>
-                    <option value="">Pilih Tipe Pembayaran</option>
+                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-white text-gray-700"
+                    required onchange="handlePaymentMethodChange()">
+                    <option value="">Pilih Metode</option>
                     <option value="cash">💵 Cash</option>
                     <option value="transfer">🏦 Transfer Bank</option>
                 </select>
             </div>
 
-            <div class="mb-6">
-                <label for="modal-uang_dibayar" class="block text-sm font-medium text-gray-700 mb-2">Uang
-                    Dibayar</label>
-                <input type="number" id="modal-uang_dibayar" name="uang_dibayar" step="0.01" min="0"
-                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition bg-white font-medium"
-                    placeholder="Masukkan jumlah uang yang dibayar" required />
+            <!-- Input Jumlah Bayar Manual -->
+            <div class="mb-6" id="uang_dibayar_container">
+                <label for="uang_dibayar_input" class="block text-sm text-gray-600 mb-2">Masukkan Jumlah Bayar</label>
+                <input type="number" id="uang_dibayar_input" min="0" step="1000"
+                    class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-white text-gray-700"
+                    placeholder="Masukkan jumlah bayar..." />
             </div>
 
-            <div class="flex justify-end gap-3">
+            <!-- Hidden Input for Amount -->
+            <input type="hidden" id="modal-uang_dibayar" name="uang_dibayar" value="0" />
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
                 <button type="button" @click="$dispatch('close-modal', { name: 'payment-confirmation-modal' })"
-                    class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-medium">
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition font-bold shadow-lg">
                     Batal
                 </button>
                 <button type="submit"
-                    class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition font-bold">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 inline mr-2" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Konfirmasi Pesanan
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition font-bold shadow-lg">
+                    Bayar
                 </button>
             </div>
         </form>
+
+        <script>
+            // Variabel total dari server
+            const cartTotal = {{ $modalTotal ?? 0 }};
+
+            // Function to update modal with cart total
+            function updateModalTotal() {
+                document.getElementById('modal-total-belanja').textContent = 'Rp ' + cartTotal.toLocaleString('id-ID');
+                document.getElementById('modal-nominal-bayar').textContent = 'Rp ' + cartTotal.toLocaleString('id-ID');
+                document.getElementById('uang_dibayar_input').value = '';
+                document.getElementById('modal-uang_dibayar').value = 0;
+                calculateChange();
+            }
+
+            // Calculate change
+            function calculateChange() {
+                const total = cartTotal;
+                const paid = parseInt(document.getElementById('uang_dibayar_input').value) || 0;
+                const change = paid - total;
+
+                document.getElementById('modal-uang_dibayar').value = paid;
+                document.getElementById('modal-nominal-bayar').textContent = 'Rp ' + paid.toLocaleString('id-ID');
+                document.getElementById('modal-kembalian').textContent = 'Rp ' + (change > 0 ? change.toLocaleString('id-ID') :
+                    '0');
+            }
+
+            // Handle payment method change
+            function handlePaymentMethodChange() {
+                const paymentMethod = document.getElementById('modal-tipe_pembayaran').value;
+                const amountContainer = document.getElementById('uang_dibayar_container');
+                const amountInput = document.getElementById('uang_dibayar_input');
+
+                if (paymentMethod === 'transfer') {
+                    amountContainer.style.display = 'none';
+                    amountInput.value = '';
+                    amountInput.required = false;
+                    document.getElementById('modal-uang_dibayar').value = cartTotal;
+                    document.getElementById('modal-nominal-bayar').textContent = 'Rp ' + cartTotal.toLocaleString('id-ID');
+                    document.getElementById('modal-kembalian').textContent = 'Rp 0';
+                } else {
+                    amountContainer.style.display = 'block';
+                    amountInput.required = true;
+                    calculateChange();
+                }
+            }
+
+            // Initialize on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                updateModalTotal();
+
+                // Add event listener for manual input
+                document.getElementById('uang_dibayar_input').addEventListener('input', calculateChange);
+            });
+        </script>
     </div>
 </x-modal>
-
-
