@@ -1,38 +1,38 @@
 <x-guest-layout>
         <!-- Main Container -->
-        <div class="flex w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div class="flex w-full max-w-5xl mx-auto bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden">
             <!-- Left Side - Brand Section -->
-            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-800 to-slate-900 flex-col items-center justify-center px-12 py-16 relative overflow-hidden">
+            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-800 to-slate-900 flex-col items-center justify-center px-8 xl:px-12 py-12 xl:py-16 relative overflow-hidden">
                 <!-- Decorative Background Elements -->
-                <div class="absolute -bottom-20 -left-20 w-72 h-72 bg-white/5 rounded-full"></div>
-                <div class="absolute top-10 right-10 w-32 h-32 bg-white/5 rounded-full"></div>
-                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full"></div>
+                <div class="absolute -bottom-20 -left-20 w-64 xl:w-72 h-64 xl:h-72 bg-white/5 rounded-full"></div>
+                <div class="absolute top-10 right-10 w-24 xl:w-32 h-24 xl:h-32 bg-white/5 rounded-full"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 xl:w-96 h-80 xl:h-96 bg-white/5 rounded-full"></div>
 
                 <!-- Logo Circle -->
-                <div class="w-32 h-32 bg-white rounded-full flex items-center justify-center mb-8 relative z-10 shadow-2xl">
-                    <svg class="w-16 h-16 fill-slate-800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div class="w-24 xl:w-32 h-24 xl:h-32 bg-white rounded-full flex items-center justify-center mb-6 xl:mb-8 relative z-10 shadow-2xl">
+                    <svg class="w-12 xl:w-16 h-12 xl:h-16 fill-slate-800" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                     </svg>
                 </div>
                 
                 <!-- Login Title -->
-                <div class="text-white text-6xl font-bold uppercase tracking-[0.3em] relative z-10 mb-4">LOGIN</div>
+                <div class="text-white text-4xl xl:text-5xl 2xl:text-6xl font-bold uppercase tracking-[0.2em] xl:tracking-[0.3em] relative z-10 mb-3 xl:mb-4">LOGIN</div>
                 
                 <!-- Subtitle -->
-                <p class="text-slate-300 text-base relative z-10 text-center">Selamat datang kembali di AMKAS</p>
+                <p class="text-slate-300 text-sm xl:text-base relative z-10 text-center px-4">Selamat datang kembali di AMKAS</p>
             </div>
 
             <!-- Right Side - Form Section -->
-            <div class="w-full lg:w-1/2 bg-white flex items-center justify-center px-8 py-12 lg:px-12 lg:py-16">
+            <div class="w-full lg:w-1/2 bg-white flex items-center justify-center px-6 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 lg:px-12 lg:py-16">
                 <div class="w-full max-w-md">
                     <!-- Mobile Logo (visible only on mobile) -->
-                    <div class="lg:hidden flex flex-col items-center mb-8">
-                        <div class="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center mb-4 shadow-xl">
-                            <svg class="w-10 h-10 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <div class="lg:hidden flex flex-col items-center mb-6 sm:mb-8">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center mb-3 sm:mb-4 shadow-xl">
+                            <svg class="w-8 h-8 sm:w-10 sm:h-10 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                             </svg>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-800 tracking-wider">LOGIN</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800 tracking-wider">LOGIN</h2>
                     </div>
 
                     
@@ -40,20 +40,20 @@
                     <!-- Session Status -->
                     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    <form method="POST" action="{{ route('login') }}" class="space-y-4 sm:space-y-5">
                         @csrf
 
                         <!-- Email Address -->
                         <div class="relative">
-                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
-                                <div class="w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
-                                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-lg sm:rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
+                                <div class="w-12 sm:w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                                     </svg>
                                 </div>
                                 <input
                                     id="email"
-                                    class="flex-1 border-none px-5 py-4 text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-xs placeholder:tracking-wider focus:ring-0"
+                                    class="flex-1 border-none px-3 py-3 sm:px-4 sm:py-4 text-xs sm:text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-[10px] sm:placeholder:text-xs placeholder:tracking-wider focus:ring-0"
                                     type="email"
                                     name="email"
                                     value="{{ old('email') }}"
@@ -68,15 +68,15 @@
 
                         <!-- Password -->
                         <div class="relative">
-                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
-                                <div class="w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
-                                    <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <div class="relative flex items-stretch border-2 border-slate-200 rounded-lg sm:rounded-xl transition-all duration-300 focus-within:border-slate-700 focus-within:shadow-lg overflow-hidden">
+                                <div class="w-12 sm:w-14 flex items-center justify-center bg-slate-800 flex-shrink-0">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5 fill-white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                                     </svg>
                                 </div>
                                 <input
                                     id="password"
-                                    class="flex-1 border-none px-5 py-4 text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-xs placeholder:tracking-wider focus:ring-0"
+                                    class="flex-1 border-none px-3 py-3 sm:px-4 sm:py-4 text-xs sm:text-sm outline-none bg-transparent placeholder:text-slate-400 placeholder:uppercase placeholder:text-[10px] sm:placeholder:text-xs placeholder:tracking-wider focus:ring-0"
                                     type="password"
                                     name="password"
                                     required
@@ -92,17 +92,17 @@
                         <!-- Login Button -->
                         <button 
                             type="submit" 
-                            class="w-full py-4 bg-slate-800 text-white border-none rounded-xl text-sm font-bold uppercase tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-slate-700 hover:shadow-xl hover:shadow-slate-800/30 active:translate-y-0.5 mt-6"
+                            class="w-full py-3 sm:py-4 bg-slate-800 text-white border-none rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold uppercase tracking-[0.15em] sm:tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-slate-700 hover:shadow-xl hover:shadow-slate-800/30 active:translate-y-0.5 mt-5 sm:mt-6"
                         >
                             LOGIN
                         </button>
 
                         <!-- Forgot Password -->
                         @if (Route::has('password.request'))
-                            <div class="text-center mt-6">
+                            <div class="text-center mt-4 sm:mt-6">
                                 <a
                                     href="{{ route('password.request') }}"
-                                    class="text-slate-700 text-sm no-underline font-medium hover:text-slate-900 hover:underline transition-all duration-200"
+                                    class="text-slate-700 text-xs sm:text-sm no-underline font-medium hover:text-slate-900 hover:underline transition-all duration-200"
                                 >
                                     Forgot your password?
                                 </a>
