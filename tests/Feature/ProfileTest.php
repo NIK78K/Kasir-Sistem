@@ -30,6 +30,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => 'test@example.com',
+                '_token' => csrf_token(),
             ]);
 
         $response
@@ -52,6 +53,7 @@ class ProfileTest extends TestCase
             ->patch('/profile', [
                 'name' => 'Test User',
                 'email' => $user->email,
+                '_token' => csrf_token(),
             ]);
 
         $response
@@ -69,6 +71,7 @@ class ProfileTest extends TestCase
             ->actingAs($user)
             ->delete('/profile', [
                 'password' => 'password',
+                '_token' => csrf_token(),
             ]);
 
         $response
@@ -88,6 +91,7 @@ class ProfileTest extends TestCase
             ->from('/profile')
             ->delete('/profile', [
                 'password' => 'wrong-password',
+                '_token' => csrf_token(),
             ]);
 
         $response

@@ -35,15 +35,7 @@
                         <h2 class="text-2xl font-bold text-slate-800 tracking-wider">LOGIN</h2>
                     </div>
 
-                    <!-- Tab Header -->
-                    <div class="flex justify-end mb-10 gap-2">
-                        <button class="px-4 py-2 text-slate-400 text-xs font-semibold uppercase cursor-default transition-all">
-                            ←
-                        </button>
-                        <button class="px-6 py-2 bg-slate-800 text-white text-xs font-semibold uppercase border-none rounded-lg cursor-default shadow-md">
-                            LOGIN
-                        </button>
-                    </div>
+                    
 
                     <!-- Session Status -->
                     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -95,18 +87,7 @@
                             <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs text-red-600" />
                         </div>
 
-                        <!-- Remember Me & Terms -->
-                        <div class="flex items-start pt-2">
-                            <input 
-                                id="remember_me" 
-                                type="checkbox" 
-                                name="remember" 
-                                class="w-4 h-4 mt-0.5 mr-3 cursor-pointer accent-slate-800 rounded border-slate-300 focus:ring-slate-700"
-                            >
-                            <label for="remember_me" class="text-xs text-slate-600 cursor-pointer select-none leading-relaxed">
-                                I have accepted the terms and conditions
-                            </label>
-                        </div>
+
 
                         <!-- Login Button -->
                         <button 
@@ -119,8 +100,8 @@
                         <!-- Forgot Password -->
                         @if (Route::has('password.request'))
                             <div class="text-center mt-6">
-                                <a 
-                                    href="{{ route('password.request') }}" 
+                                <a
+                                    href="{{ route('password.request') }}"
                                     class="text-slate-700 text-sm no-underline font-medium hover:text-slate-900 hover:underline transition-all duration-200"
                                 >
                                     Forgot your password?

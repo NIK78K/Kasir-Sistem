@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+# Disallow typical auth-only routes
+Disallow: /login
+Disallow: /register
+Disallow: /password
+Disallow: /profile
+Allow: /
+
+# Optional: set your sitemap URL when available
+# Sitemap: {{ config('app.url', env('APP_URL')) }}/sitemap.xml

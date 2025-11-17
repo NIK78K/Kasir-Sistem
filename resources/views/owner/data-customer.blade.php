@@ -15,13 +15,42 @@
                 Data Customer
             </h1>
         </div>
+        <h2 class="sr-only">Filter dan Pencarian</h2>
 
-        {{-- Alert --}}
+        {{-- Alert (Hidden - using global popup) --}}
         @if (session('success'))
-            <div class="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg shadow">
-                ✅ {{ session('success') }}
-            </div>
+            <div class="hidden">{{ session('success') }}</div>
         @endif
+
+        {{-- Filter dan Search --}}
+        <div class="mb-8">
+            <form method="GET" action="{{ route('owner.dataCustomer') }}" id="filter-form" class="space-y-3">
+                {{-- Search Bar --}}
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </span>
+                    <input type="text" name="search" placeholder="Cari Customer (Nama, Alamat, No HP)" value="{{ request('search') }}"
+                        class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                </div>
+
+                {{-- Tipe Pembeli Filter Pills --}}
+                <div class="flex flex-wrap gap-2 items-center">
+                    <button type="button" data-tipe="" class="tipe-filter-btn tipe-pill px-4 py-2 rounded-full text-sm font-semibold transition {{ !request('tipe_pembeli') ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                        Semua Tipe
+                    </button>
+                    @foreach($allTipePembeli as $tipe)
+                        <button type="button" data-tipe="{{ $tipe }}" class="tipe-filter-btn tipe-pill px-4 py-2 rounded-full text-sm font-semibold transition {{ request('tipe_pembeli') == $tipe ? 'bg-green-500 text-white shadow-md' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                            {{ ucfirst($tipe) }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <input type="hidden" name="tipe_pembeli" id="tipe_pembeli_input" value="{{ request('tipe_pembeli') }}">
+            </form>
+        </div>
 
         {{-- Table for Desktop --}}
         <div class="hidden md:block overflow-x-auto bg-white shadow-lg rounded-xl border border-gray-200">
@@ -45,8 +74,8 @@
                             <td class="py-4 px-4">
                                 <span
                                     class="px-3 py-1 text-xs font-semibold rounded-full
-                                    {{ $customer->tipe_pembeli == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
-                                    {{ ucfirst($customer->tipe_pembeli) }}
+                                    {{ in_array($customer->tipe_pembeli, ['bengkel_langganan', 'bengkel', 'langganan']) ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                                    {{ $customer->tipe_pembeli == 'bengkel_langganan' || $customer->tipe_pembeli == 'bengkel' || $customer->tipe_pembeli == 'langganan' ? 'Bengkel Langganan' : 'Pembeli' }}
                                 </span>
                             </td>
                         </tr>
@@ -56,7 +85,13 @@
                     @if ($customers->isEmpty())
                         <tr>
                             <td colspan="5" class="py-8 text-center text-gray-500">
-                                Belum ada data customer.
+                                @if(request('tipe_pembeli'))
+                                    <p>Tidak ditemukan customer dengan tipe <span class="font-semibold">"{{ ucfirst(request('tipe_pembeli')) }}"</span>.</p>
+                                @elseif(request('search'))
+                                    <p>Tidak ditemukan customer dengan kata kunci <span class="font-semibold">"{{ request('search') }}"</span>.</p>
+                                @else
+                                    Belum ada data customer.
+                                @endif
                             </td>
                         </tr>
                     @endif
@@ -70,8 +105,8 @@
                 <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-4">
                     <div class="flex justify-between items-start mb-3">
                         <h3 class="text-lg font-bold text-gray-900">{{ $customer->nama_customer }}</h3>
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $customer->tipe_pembeli == 'grosir' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
-                            {{ ucfirst($customer->tipe_pembeli) }}
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full {{ in_array($customer->tipe_pembeli, ['bengkel_langganan', 'bengkel', 'langganan']) ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700' }}">
+                            {{ $customer->tipe_pembeli == 'bengkel_langganan' || $customer->tipe_pembeli == 'bengkel' || $customer->tipe_pembeli == 'langganan' ? 'Bengkel Langganan' : 'Pembeli' }}
                         </span>
                     </div>
                     <div class="space-y-2 text-sm text-gray-600">
@@ -85,9 +120,40 @@
             {{-- Jika kosong --}}
             @if ($customers->isEmpty())
                 <div class="bg-white shadow-lg rounded-xl border border-gray-200 p-8 text-center text-gray-500">
-                    Belum ada data customer.
+                    @if(request('tipe_pembeli'))
+                        <p>Tidak ditemukan customer dengan tipe <span class="font-semibold">"{{ ucfirst(request('tipe_pembeli')) }}"</span>.</p>
+                    @elseif(request('search'))
+                        <p>Tidak ditemukan customer dengan kata kunci <span class="font-semibold">"{{ request('search') }}"</span>.</p>
+                    @else
+                        Belum ada data customer.
+                    @endif
                 </div>
             @endif
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        // Filter tipe pembeli function dengan event delegation
+        document.addEventListener('click', function(e) {
+            // Handle tipe filter buttons
+            if (e.target.classList.contains('tipe-filter-btn')) {
+                document.getElementById('tipe_pembeli_input').value = e.target.getAttribute('data-tipe');
+                document.getElementById('filter-form').submit();
+            }
+        });
+
+        // Auto-submit search form on input (debounced) - Real-time search
+        let searchTimeout;
+        const searchInput = document.querySelector('input[name="search"]');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    document.getElementById('filter-form').submit();
+                }, 500); // Wait 500ms after user stops typing
+            });
+        }
+    </script>
+@endpush

@@ -11,6 +11,11 @@ class CustomerControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+    }
+
     public function test_index_displays_customers()
     {
         $user = User::factory()->create(['role' => 'kasir']);
@@ -46,13 +51,19 @@ class CustomerControllerTest extends TestCase
             'alamat' => '123 Main St',
             'tipe_pembeli' => 'pembeli',
             'no_hp' => '08123456789',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('customer.store'), $data);
 
         $response->assertRedirect(route('customer.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('customers', $data);
+        $this->assertDatabaseHas('customers', [
+            'nama_customer' => 'John Doe',
+            'alamat' => '123 Main St',
+            'tipe_pembeli' => 'pembeli',
+            'no_hp' => '08123456789',
+        ]);
     }
 
     public function test_store_fails_with_invalid_data()
@@ -63,6 +74,7 @@ class CustomerControllerTest extends TestCase
         $data = [
             'nama_customer' => '',
             'tipe_pembeli' => 'invalid',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('customer.store'), $data);
@@ -71,7 +83,7 @@ class CustomerControllerTest extends TestCase
         $response->assertSessionHasErrors(['nama_customer', 'tipe_pembeli']);
     }
 
-    public function test_store_fails_with_duplicate_nama_customer()
+    public function test_store_allows_duplicate_nama_customer()
     {
         $user = User::factory()->create(['role' => 'kasir']);
         $this->actingAs($user);
@@ -83,12 +95,14 @@ class CustomerControllerTest extends TestCase
             'alamat' => '123 Main St',
             'tipe_pembeli' => 'pembeli',
             'no_hp' => '08123456789',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('customer.store'), $data);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('nama_customer');
+        $response->assertRedirect(route('customer.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('customers', ['nama_customer' => 'John Doe']);
     }
 
     public function test_edit_displays_form()
@@ -116,16 +130,22 @@ class CustomerControllerTest extends TestCase
             'alamat' => '456 Oak St',
             'tipe_pembeli' => 'langganan',
             'no_hp' => '08987654321',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('customer.update', $customer), $data);
 
         $response->assertRedirect(route('customer.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseHas('customers', array_merge($data, ['id' => $customer->id]));
+        $this->assertDatabaseHas('customers', [
+            'nama_customer' => 'Jane Doe',
+            'alamat' => '456 Oak St',
+            'tipe_pembeli' => 'langganan',
+            'no_hp' => '08987654321',
+        ]);
     }
 
-    public function test_update_fails_with_duplicate_nama_customer()
+    public function test_update_allows_duplicate_nama_customer()
     {
         $user = User::factory()->create(['role' => 'kasir']);
         $this->actingAs($user);
@@ -138,12 +158,14 @@ class CustomerControllerTest extends TestCase
             'alamat' => '123 Main St',
             'tipe_pembeli' => 'pembeli',
             'no_hp' => '08123456789',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('customer.update', $customer2), $data);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('nama_customer');
+        $response->assertRedirect(route('customer.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('customers', ['nama_customer' => 'John']);
     }
 
     public function test_destroy_deletes_customer()
@@ -153,10 +175,10 @@ class CustomerControllerTest extends TestCase
 
         $customer = Customer::factory()->create();
 
-        $response = $this->delete(route('customer.destroy', $customer));
+        $response = $this->delete(route('customer.destroy', $customer), ['_token' => csrf_token()]);
 
         $response->assertRedirect(route('customer.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('customers', ['id' => $customer->id]);
+        $this->assertSoftDeleted('customers', ['id' => $customer->id]);
     }
 }

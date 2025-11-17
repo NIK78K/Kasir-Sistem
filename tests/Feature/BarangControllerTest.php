@@ -15,7 +15,7 @@ class BarangControllerTest extends TestCase
 
     public function test_index_displays_barangs()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         Barang::factory()->count(3)->create();
@@ -29,7 +29,7 @@ class BarangControllerTest extends TestCase
 
     public function test_index_filters_by_kategori()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         Barang::factory()->create(['kategori' => 'Sepeda Pasifik']);
@@ -44,7 +44,7 @@ class BarangControllerTest extends TestCase
 
     public function test_index_filters_by_search()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         Barang::factory()->create(['nama_barang' => 'Laptop']);
@@ -57,20 +57,21 @@ class BarangControllerTest extends TestCase
         $this->assertEquals('Laptop', $response->viewData('barangs')->first()->nama_barang);
     }
 
-    public function test_create_displays_form()
+    public function test_index_displays_create_modal()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
-        $response = $this->get(route('barang.create'));
+        $response = $this->get(route('barang.index'));
 
         $response->assertStatus(200);
-        $response->assertViewIs('barang.create');
+        $response->assertSee('id="create-barang-modal"', false);
+        $response->assertSee('Tambah Barang', false);
     }
 
     public function test_store_creates_barang()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         Storage::fake('public');
@@ -81,7 +82,7 @@ class BarangControllerTest extends TestCase
             'harga_grosir' => 8000,
             'stok' => 50,
             'kategori' => 'Sepeda Pasifik',
-            'gambar' => UploadedFile::fake()->image('test.jpg'),
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('barang.store'), $data);
@@ -97,9 +98,43 @@ class BarangControllerTest extends TestCase
         ]);
     }
 
+    public function test_store_creates_barang_with_image()
+    {
+        $user = User::factory()->create(['role' => 'owner']);
+        $this->actingAs($user);
+
+        Storage::fake('public');
+
+        $file = UploadedFile::fake()->image('test.jpg');
+
+        $data = [
+            'nama_barang' => 'Test Barang',
+            'harga' => 10000,
+            'harga_grosir' => 8000,
+            'stok' => 50,
+            'kategori' => 'Sepeda Pasifik',
+            'gambar' => $file,
+            '_token' => csrf_token(),
+        ];
+
+        $response = $this->post(route('barang.store'), $data);
+
+        $response->assertRedirect(route('barang.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('barangs', [
+            'nama_barang' => 'Test Barang',
+            'harga' => 10000,
+            'harga_grosir' => 8000,
+            'stok' => 50,
+            'kategori' => 'Sepeda Pasifik',
+        ]);
+
+        Storage::disk('public')->assertExists('barang_images/' . $file->hashName());
+    }
+
     public function test_store_fails_with_invalid_data()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         $data = [
@@ -107,6 +142,7 @@ class BarangControllerTest extends TestCase
             'harga' => 'invalid',
             'stok' => -1,
             'kategori' => '',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('barang.store'), $data);
@@ -115,42 +151,82 @@ class BarangControllerTest extends TestCase
         $response->assertSessionHasErrors(['nama_barang', 'harga', 'stok', 'kategori']);
     }
 
-    public function test_store_fails_with_duplicate_nama_barang()
+    public function test_update_modifies_barang_with_image()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
-        Barang::factory()->create(['nama_barang' => 'Duplicate Name']);
+        Storage::fake('public');
+
+        $barang = Barang::factory()->create();
+        $file = UploadedFile::fake()->image('updated.jpg');
+
+        $data = [
+            'nama_barang' => 'Updated Name',
+            'harga' => 20000,
+            'harga_grosir' => 15000,
+            'stok' => 30,
+            'kategori' => 'Sepeda Listrik',
+            'gambar' => $file,
+            '_token' => csrf_token(),
+        ];
+
+        $response = $this->put(route('barang.update', $barang), $data);
+
+        $response->assertRedirect(route('barang.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('barangs', [
+            'nama_barang' => 'Updated Name',
+            'harga' => 20000,
+            'harga_grosir' => 15000,
+            'stok' => 30,
+            'kategori' => 'Sepeda Listrik',
+        ]);
+
+        Storage::disk('public')->assertExists('barang_images/' . $file->hashName());
+    }
+
+    public function test_store_allows_duplicate_nama_barang()
+    {
+        $user = User::factory()->create(['role' => 'owner']);
+        $this->actingAs($user);
+
+        // Create a soft deleted barang (is_deleted = true)
+        Barang::factory()->create(['nama_barang' => 'Duplicate Name', 'is_deleted' => true]);
 
         $data = [
             'nama_barang' => 'Duplicate Name',
             'harga' => 10000,
+            'harga_grosir' => 8000,
             'stok' => 10,
             'kategori' => 'Sepeda Pasifik',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('barang.store'), $data);
 
-        $response->assertRedirect();
-        $response->assertSessionHasErrors('nama_barang');
+        $response->assertRedirect(route('barang.index'));
+        $response->assertSessionHas('success');
+        $this->assertDatabaseHas('barangs', ['nama_barang' => 'Duplicate Name', 'is_deleted' => false]);
     }
 
-    public function test_edit_displays_form()
+    public function test_index_displays_edit_modals()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         $barang = Barang::factory()->create();
 
-        $response = $this->get(route('barang.edit', $barang));
+        $response = $this->get(route('barang.index'));
 
         $response->assertStatus(200);
-        $response->assertViewHas('barang', $barang);
+        $response->assertSee('id="edit-barang-modal"', false);
+        $response->assertSee('Edit', false);
     }
 
     public function test_update_modifies_barang()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         $barang = Barang::factory()->create();
@@ -161,6 +237,7 @@ class BarangControllerTest extends TestCase
             'harga_grosir' => 15000,
             'stok' => 30,
             'kategori' => 'Sepeda Listrik',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('barang.update', $barang), $data);
@@ -168,7 +245,6 @@ class BarangControllerTest extends TestCase
         $response->assertRedirect(route('barang.index'));
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('barangs', [
-            'id' => $barang->id,
             'nama_barang' => 'Updated Name',
             'harga' => 20000,
             'harga_grosir' => 15000,
@@ -177,9 +253,9 @@ class BarangControllerTest extends TestCase
         ]);
     }
 
-    public function test_update_fails_with_duplicate_nama_barang()
+    public function test_update_allows_duplicate_nama_barang()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         $barang1 = Barang::factory()->create(['nama_barang' => 'Name 1']);
@@ -188,8 +264,10 @@ class BarangControllerTest extends TestCase
         $data = [
             'nama_barang' => 'Name 1',
             'harga' => 10000,
+            'harga_grosir' => 8000,
             'stok' => 10,
             'kategori' => 'Sepeda Pasifik',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('barang.update', $barang2), $data);
@@ -200,15 +278,15 @@ class BarangControllerTest extends TestCase
 
     public function test_destroy_deletes_barang()
     {
-        $user = User::factory()->create(['role' => 'kasir']);
+        $user = User::factory()->create(['role' => 'owner']);
         $this->actingAs($user);
 
         $barang = Barang::factory()->create();
 
-        $response = $this->delete(route('barang.destroy', $barang));
+        $response = $this->delete(route('barang.destroy', $barang), ['_token' => csrf_token()]);
 
         $response->assertRedirect(route('barang.index'));
         $response->assertSessionHas('success');
-        $this->assertDatabaseMissing('barangs', ['id' => $barang->id]);
+        $this->assertDatabaseHas('barangs', ['id' => $barang->id, 'is_deleted' => true]);
     }
 }

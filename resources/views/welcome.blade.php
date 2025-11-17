@@ -31,10 +31,10 @@
                         
                         <!-- Tagline -->
                         <p class="text-lg sm:text-xl lg:text-2xl text-slate-300 font-medium mb-3 animate-fade-in animation-delay-400 animation-fill-both">
-                            Point of Sale Modern untuk Bisnis Anda
+                            Kasir Modern untuk Bisnis Anda
                         </p>
                         <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto animate-fade-in animation-delay-600 animation-fill-both">
-                            Kelola bisnis retail Anda dengan sistem POS yang cepat, mudah, dan terpercaya
+                            Kelola bisnis Anda dengan sistem kasir yang cepat, mudah, dan terpercaya
                         </p>
                     </div>
 
@@ -42,28 +42,28 @@
                     <div class="px-6 sm:px-12 pb-8">
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                             <!-- Feature 1 -->
-                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-800 animation-fill-both">
+                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-800 animation-fill-both text-center">
                                 <div class="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📦</div>
                                 <h3 class="text-lg font-semibold text-white mb-2">Manajemen Barang</h3>
                                 <p class="text-sm text-white/70 leading-relaxed">Kelola stok dan harga dengan mudah</p>
                             </div>
 
                             <!-- Feature 2 -->
-                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-900 animation-fill-both">
+                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-900 animation-fill-both text-center">
                                 <div class="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">⚡</div>
                                 <h3 class="text-lg font-semibold text-white mb-2">Transaksi Cepat</h3>
                                 <p class="text-sm text-white/70 leading-relaxed">Proses penjualan secara efisien</p>
                             </div>
 
                             <!-- Feature 3 -->
-                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-1000 animation-fill-both">
+                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-1000 animation-fill-both text-center">
                                 <div class="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">👥</div>
                                 <h3 class="text-lg font-semibold text-white mb-2">Multi User</h3>
                                 <p class="text-sm text-white/70 leading-relaxed">Akses sesuai peran pengguna</p>
                             </div>
 
                             <!-- Feature 4 -->
-                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-1100 animation-fill-both">
+                            <div class="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/15 hover:border-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-1100 animation-fill-both text-center">
                                 <div class="text-5xl mb-4 transform group-hover:scale-110 transition-transform duration-300">📊</div>
                                 <h3 class="text-lg font-semibold text-white mb-2">Laporan Lengkap</h3>
                                 <p class="text-sm text-white/70 leading-relaxed">Pantau performa bisnis real-time</p>
@@ -110,7 +110,7 @@
 
                 <!-- Footer Info -->
                 <div class="text-center mt-8 text-slate-400 text-sm animate-fade-in animation-delay-1400 animation-fill-both">
-                    <p>&copy; {{ date('Y') }} AMKAS. Sistem Point of Sale Modern.</p>
+                    <p>&copy; 2025 AMKAS. Sistem Kasir Modern.</p>
                 </div>
             </div>
         </div>

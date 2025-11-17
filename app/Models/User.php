@@ -24,6 +24,8 @@ class User extends Authenticatable
         'role',
         'last_viewed_barang_at',
         'last_viewed_customer_at',
+        'invitation_token',
+        'invited_at',
     ];
 
     /**
@@ -48,6 +50,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'last_viewed_barang_at' => 'datetime',
             'last_viewed_customer_at' => 'datetime',
+            'invited_at' => 'datetime',
         ];
     }
 }

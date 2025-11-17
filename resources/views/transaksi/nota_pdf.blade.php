@@ -11,6 +11,7 @@
     <div style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 15px;">
         <h1 style="margin: 0; font-size: 24px;">NOTA PEMBELIAN</h1>
         <p style="margin: 5px 0 0 0; font-size: 11px;">Terima kasih atas kepercayaan Anda</p>
+        <p style="margin: 5px 0 0 0; font-size: 12px;">Nomor Transaksi: {{ $transaksis->first()->order_id }}</p>
         <p style="margin: 5px 0 0 0; font-size: 12px;">Tanggal: {{ now()->format('d/m/Y H:i:s') }}</p>
     </div>
 

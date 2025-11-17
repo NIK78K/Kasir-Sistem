@@ -132,9 +132,9 @@ class OwnerControllerTest extends TestCase
         $response = $this->get(route('owner.laporanPenjualan'));
 
         $response->assertStatus(200);
-        $response->assertViewHas('transaksis');
-        $this->assertCount(1, $response->viewData('transaksis'));
-        $this->assertEquals('selesai', $response->viewData('transaksis')->first()->status);
+        $response->assertViewHas('orders');
+        $this->assertCount(1, $response->viewData('orders'));
+        $this->assertEquals('selesai', $response->viewData('orders')->first()->items->first()->status);
     }
 
     public function test_laporan_barang_return_displays_return_transactions()
@@ -149,7 +149,7 @@ class OwnerControllerTest extends TestCase
         $response = $this->get(route('owner.laporanBarangReturn'));
 
         $response->assertStatus(200);
-        $response->assertViewHas('transaksis');
-        $this->assertCount(2, $response->viewData('transaksis'));
+        $response->assertViewHas('orders');
+        $this->assertCount(2, $response->viewData('orders'));
     }
 }

@@ -1,8 +1,27 @@
 @extends('layouts.app')
 
 @section('title', '- Dashboard')
+@section('meta_description', 'Ringkasan penjualan, total transaksi, pelanggan dan performa bisnis Anda di sistem kasir AMKAS.')
 
 @section('content')
+@push('head')
+    <!-- Lightweight loader: inject ApexCharts only when requested -->
+    <script>
+        window.loadApexCharts = function() {
+            if (window.ApexCharts) return Promise.resolve();
+            if (window.__apexPromise) return window.__apexPromise;
+            window.__apexPromise = new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/apexcharts';
+                s.defer = true;
+                s.onload = () => resolve();
+                s.onerror = reject;
+                document.head.appendChild(s);
+            });
+            return window.__apexPromise;
+        };
+    </script>
+@endpush
 
 <!-- Welcome Banner dengan Gradient Dinamis -->
 <div class="relative rounded-3xl p-3 md:p-4 text-white shadow-2xl mb-6 overflow-hidden bg-gray-700">
@@ -28,7 +47,7 @@
 </div>
 
 <!-- Stats Cards dengan Animasi -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-{{ Auth::user()->role === 'owner' ? '5' : '4' }} gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-{{ Auth::user()->role === 'owner' ? '5' : '4' }} gap-4 mb-6">
     <!-- Card 1: Total Produk -->
     <div class="group relative bg-white rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 overflow-hidden">
         <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 opacity-10 rounded-full -mr-12 -mt-12 group-hover:scale-150 transition-transform duration-500"></div>
@@ -140,7 +159,7 @@
 <!-- Menu Cepat dengan Design Modern -->
 <div class="flex items-center justify-between mb-4">
     <div>
-        <h3 class="text-xl font-bold text-gray-800 mb-1">Menu Cepat</h3>
+                <h2 class="text-xl font-bold text-gray-800 mb-1">Menu Cepat</h2>
         <p class="text-gray-500 text-sm">Akses fitur dengan cepat dan mudah</p>
     </div>
     <div class="hidden md:block p-2 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg shadow-lg">
@@ -150,22 +169,14 @@
     </div>
 </div>
 
-<!-- Grid untuk Kasir: 4 kolom (lebih pas untuk 4 item) -->
+<!-- Grid untuk Kasir: 3 kolom -->
 @if(Auth::user()->role === 'kasir')
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
     <a href="{{ route('transaksi.index') }}" class="group relative bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-indigo-600 hover:to-purple-600 border border-indigo-200 hover:border-transparent overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         <div class="relative z-10 flex flex-col items-center gap-2">
             <div class="text-3xl transform group-hover:scale-110 transition-transform duration-300">🛒</div>
             <span class="text-xs font-bold text-indigo-900 group-hover:text-white transition-colors duration-300">Transaksi</span>
-        </div>
-    </a>
-
-    <a href="{{ route('barang.index') }}" class="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-blue-600 hover:to-blue-700 border border-blue-200 hover:border-transparent overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-        <div class="relative z-10 flex flex-col items-center gap-2">
-            <div class="text-3xl transform group-hover:scale-110 transition-transform duration-300">📦</div>
-            <span class="text-xs font-bold text-blue-900 group-hover:text-white transition-colors duration-300">Data Barang</span>
         </div>
     </a>
 
@@ -188,8 +199,8 @@
 
 <!-- Grid untuk Owner: 5 kolom (untuk 5 item) -->
 @elseif(Auth::user()->role === 'owner')
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <a href="{{ url('data-barang') }}" class="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-blue-600 hover:to-blue-700 border border-blue-200 hover:border-transparent overflow-hidden">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        <a href="{{ route('barang.index') }}" class="group relative bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:from-blue-600 hover:to-blue-700 border border-blue-200 hover:border-transparent overflow-hidden">
             <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             <div class="relative z-10 flex flex-col items-center gap-2">
                 <div class="text-3xl transform group-hover:scale-110 transition-transform duration-300">📦</div>
@@ -233,12 +244,15 @@
 
 @if(Auth::user()->role === 'owner')
 <!-- Chart Section -->
-<div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6"
+    x-data="chartManager()"
+    x-init="initDeferredCharts()"
+    style="content-visibility:auto; contain-intrinsic-size:800px;">
     <!-- Chart Penjualan -->
     <div class="bg-white rounded-xl shadow-lg p-6">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-xl font-bold text-gray-800 mb-1">Grafik Penjualan</h3>
+                <h2 class="text-xl font-bold text-gray-800 mb-1">Grafik Penjualan</h2>
                 <p class="text-gray-500 text-sm">Data penjualan perbulan</p>
             </div>
             <div class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
@@ -254,7 +268,7 @@
     <div class="bg-white rounded-xl shadow-lg p-6">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-xl font-bold text-gray-800 mb-1">Grafik Barang Return</h3>
+                <h2 class="text-xl font-bold text-gray-800 mb-1">Grafik Barang Return</h2>
                 <p class="text-gray-500 text-sm">Data barang return perbulan</p>
             </div>
             <div class="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-lg shadow-lg">
@@ -272,162 +286,260 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Chart data:', {
-        penjualanPerBulan: @json($penjualanPerBulan),
-        returnPerBulan: @json($returnPerBulan),
-        categories: @json($categories)
-    });
+function chartManager() {
+    return {
+        chartPenjualan: null,
+        chartReturn: null,
+        isLoading: false,
+        chartsRequested: false,
 
-    // Check if ApexCharts is available
-    if (typeof ApexCharts === 'undefined') {
-        console.error('ApexCharts is not loaded');
-        return;
-    }
+        initDeferredCharts() {
+            // Defer charts on mobile + initial load to improve FCP/TBT
+            const isMobile = window.matchMedia('(max-width: 768px)').matches;
+            const container = this.$root; // Alpine: root element of x-data
+            const attemptLoad = () => {
+                if (this.chartsRequested) return;
+                this.chartsRequested = true;
+                this.scheduleChartFetch();
+            };
 
-    // Chart Penjualan
-    var optionsPenjualan = {
-        series: [{
-            name: 'Penjualan',
-            data: @json($penjualanPerBulan)
-        }],
-        chart: {
-            height: 350,
-            type: 'area',
-            toolbar: {
-                show: true
-            }
-        },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 2
-        },
-        xaxis: {
-            type: 'category',
-            categories: @json($categories)
-        },
-        yaxis: {
-            labels: {
-                formatter: function(value) {
-                    if (value >= 1000000) {
-                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
-                    } else if (value >= 1000) {
-                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
-                    }
-                    return 'Rp ' + value;
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver(entries => {
+                    entries.forEach(e => {
+                        if (e.isIntersecting) {
+                            attemptLoad();
+                            io.disconnect();
+                        }
+                    });
+                }, { rootMargin: isMobile ? '0px 0px 200px 0px' : '0px 0px 100px 0px' });
+                io.observe(container);
+            } else {
+                // Fallback: idle / timeout
+                if (window.requestIdleCallback) {
+                    requestIdleCallback(() => attemptLoad(), { timeout: 4000 });
+                } else {
+                    setTimeout(attemptLoad, 2500);
                 }
             }
-        },
-        tooltip: {
-            y: {
-                formatter: function(value) {
-                    return 'Rp ' + value.toLocaleString('id-ID');
-                }
-            }
-        },
-        colors: ['#3B82F6'], // Blue for sales
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: 'vertical',
-                opacityFrom: 0.4,
-                opacityTo: 0.1,
-            }
-        }
-    };
 
-    var chartPenjualanElement = document.querySelector("#chart-penjualan");
-    if (chartPenjualanElement) {
-        console.log('Chart penjualan element found, initializing chart...');
-        try {
-            var chartPenjualan = new ApexCharts(chartPenjualanElement, optionsPenjualan);
-            chartPenjualan.render().then(function() {
-                console.log('Chart penjualan rendered successfully');
-            }).catch(function(err) {
-                console.error('Chart penjualan render error:', err);
+            // User interaction shortcut
+            ['scroll','keydown','touchstart'].forEach(ev => {
+                window.addEventListener(ev, attemptLoad, { once: true, passive: true });
             });
-        } catch (error) {
-            console.error('Error creating chart penjualan:', error);
-        }
-    } else {
-        console.error('Chart penjualan element not found');
-    }
+        },
 
-    // Chart Return
-    var optionsReturn = {
-        series: [{
-            name: 'Barang Return',
-            data: @json($returnPerBulan)
-        }],
-        chart: {
-            height: 350,
-            type: 'area',
-            toolbar: {
-                show: true
-            }
+        scheduleChartFetch() {
+            // Break up work into microtask to avoid blocking initial paint
+            setTimeout(() => this.initCharts(), 50);
         },
-        dataLabels: {
-            enabled: false
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 2
-        },
-        xaxis: {
-            type: 'category',
-            categories: @json($categories)
-        },
-        yaxis: {
-            labels: {
-                formatter: function(value) {
-                    if (value >= 1000000) {
-                        return 'Rp ' + (value / 1000000).toFixed(1) + 'M';
-                    } else if (value >= 1000) {
-                        return 'Rp ' + (value / 1000).toFixed(0) + 'K';
-                    }
-                    return 'Rp ' + value;
-                }
-            }
-        },
-        tooltip: {
-            y: {
-                formatter: function(value) {
-                    return 'Rp ' + value.toLocaleString('id-ID');
-                }
-            }
-        },
-        colors: ['#EF4444'], // Red for returns
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: 'vertical',
-                opacityFrom: 0.4,
-                opacityTo: 0.1,
-            }
-        }
-    };
 
-    var chartReturnElement = document.querySelector("#chart-return");
-    if (chartReturnElement) {
-        console.log('Chart return element found, initializing chart...');
-        try {
-            var chartReturn = new ApexCharts(chartReturnElement, optionsReturn);
-            chartReturn.render().then(function() {
-                console.log('Chart return rendered successfully');
-            }).catch(function(err) {
-                console.error('Chart return render error:', err);
+        initCharts() {
+            this.destroyCharts();
+            this.$nextTick(() => {
+                const chartPenjualanEl = document.querySelector('#chart-penjualan');
+                const chartReturnEl = document.querySelector('#chart-return');
+                if (chartPenjualanEl && chartReturnEl) {
+                    this.fetchChartData();
+                }
             });
-        } catch (error) {
-            console.error('Error creating chart return:', error);
+        },
+
+        destroyCharts() {
+            if (this.chartPenjualan) {
+                this.chartPenjualan.destroy();
+                this.chartPenjualan = null;
+            }
+            if (this.chartReturn) {
+                this.chartReturn.destroy();
+                this.chartReturn = null;
+            }
+        },
+
+        async fetchChartData() {
+            if (this.isLoading) return;
+            this.isLoading = true;
+
+            try {
+                const response = await fetch('/dashboard/chart-data', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch chart data');
+                }
+
+                const data = await response.json();
+                // Dynamically load ApexCharts only when we actually render charts
+                if (typeof window.loadApexCharts === 'function') {
+                    try {
+                        await window.loadApexCharts();
+                    } catch (e) {
+                        console.error('Failed injecting ApexCharts script', e);
+                        return; // abort chart render gracefully
+                    }
+                }
+                this.renderActualCharts(data.penjualanPerBulan, data.returnPerBulan, data.categories);
+            } catch (error) {
+                console.error('Error fetching chart data:', error);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // waitForApexCharts removed; we now rely on the loader promise
+
+        renderActualCharts(penjualanData, returnData, categories) {
+            if (typeof ApexCharts === 'undefined') {
+                // Final guard; should be loaded by now
+                console.error('ApexCharts is not loaded');
+                return;
+            }
+
+            // Chart Penjualan Options
+            const optionsPenjualan = {
+                series: [{
+                    name: 'Penjualan',
+                    data: penjualanData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: {
+                        show: true
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                xaxis: {
+                    type: 'category',
+                    categories: categories
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            if (value >= 1000000) {
+                                return 'Rp ' + (value / 1000000).toFixed(1) + ' Juta';
+                            } else if (value >= 1000) {
+                                return 'Rp ' + (value / 1000).toFixed(0) + ' Ribu';
+                            }
+                            return 'Rp ' + value;
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                },
+                colors: ['#3B82F6'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        opacityFrom: 0.4,
+                        opacityTo: 0.1,
+                    }
+                }
+            };
+
+            // Chart Return Options
+            const optionsReturn = {
+                series: [{
+                    name: 'Barang Return',
+                    data: returnData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    toolbar: {
+                        show: true
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                xaxis: {
+                    type: 'category',
+                    categories: categories
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            if (value >= 1000000) {
+                                return 'Rp ' + (value / 1000000).toFixed(1) + ' Juta';
+                            } else if (value >= 1000) {
+                                return 'Rp ' + (value / 1000).toFixed(0) + ' Ribu';
+                            }
+                            return 'Rp ' + value;
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                },
+                colors: ['#EF4444'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shade: 'light',
+                        type: 'vertical',
+                        opacityFrom: 0.4,
+                        opacityTo: 0.1,
+                    }
+                }
+            };
+
+            // Render Chart Penjualan
+            const chartPenjualanElement = document.querySelector("#chart-penjualan");
+            if (chartPenjualanElement) {
+                try {
+                    this.chartPenjualan = new ApexCharts(chartPenjualanElement, optionsPenjualan);
+                    this.chartPenjualan.render().then(() => {
+                        console.log('Chart penjualan rendered successfully');
+                    }).catch(err => {
+                        console.error('Chart penjualan render error:', err);
+                    });
+                } catch (error) {
+                    console.error('Error creating chart penjualan:', error);
+                }
+            }
+
+            // Render Chart Return
+            const chartReturnElement = document.querySelector("#chart-return");
+            if (chartReturnElement) {
+                try {
+                    this.chartReturn = new ApexCharts(chartReturnElement, optionsReturn);
+                    this.chartReturn.render().then(() => {
+                        console.log('Chart return rendered successfully');
+                    }).catch(err => {
+                        console.error('Chart return render error:', err);
+                    });
+                } catch (error) {
+                    console.error('Error creating chart return:', error);
+                }
+            }
         }
-    } else {
-        console.error('Chart return element not found');
     }
-});
+}
 </script>
 @endpush

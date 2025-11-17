@@ -17,6 +17,7 @@ class TransaksiFactory extends Factory
     public function definition(): array
     {
         return [
+            'order_id' => 'ORD-' . date('Ymd') . '-' . str_pad(fake()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT),
             'customer_id' => \App\Models\Customer::factory(),
             'barang_id' => \App\Models\Barang::factory(),
             'jumlah' => fake()->numberBetween(1, 10),

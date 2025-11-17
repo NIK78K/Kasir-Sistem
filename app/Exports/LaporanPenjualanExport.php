@@ -81,39 +81,71 @@ class LaporanPenjualanPerBulanSheet implements
         return Carbon::createFromDate($this->year, $this->month, 1)->format('M Y');
     }
     /**
-     * Mengambil data transaksi yang sudah selesai untuk bulan tertentu
+     * Mengambil data transaksi yang sudah selesai untuk bulan tertentu, dikelompokkan per order
      *
      * @return \Illuminate\Support\Collection
      */
     public function collection()
     {
-        return Transaksi::with(['barang', 'customer'])
-            ->where('status', 'selesai')
+        // Group transactions by order_id and get aggregated data
+        $orders = Transaksi::where('status', 'selesai')
             ->whereYear('tanggal_pembelian', $this->year)
             ->whereMonth('tanggal_pembelian', $this->month)
+            ->selectRaw('
+                order_id,
+                customer_id,
+                MIN(tanggal_pembelian) as tanggal_pembelian,
+                tipe_pembayaran,
+                SUM(jumlah) as total_jumlah,
+                SUM(total_harga) as total_harga,
+                uang_dibayar,
+                kembalian
+            ')
+            ->groupBy('order_id', 'customer_id', 'tipe_pembayaran', 'uang_dibayar', 'kembalian')
             ->orderBy('tanggal_pembelian', 'desc')
             ->get();
+
+        // Get detailed items for each order
+        $orders->transform(function ($order) {
+            $order->items = Transaksi::with('barang', 'customer')
+                ->where('order_id', $order->order_id)
+                ->where('status', 'selesai')
+                ->get();
+            $order->customer = $order->items->first()->customer;
+            return $order;
+        });
+
+        return $orders;
     }
 
     /**
      * Mapping data untuk setiap row
      *
-     * @param Transaksi $transaksi
+     * @param mixed $order
      * @return array
      */
-    public function map($transaksi): array
+    public function map($order): array
     {
+        // Combine all items in the order
+        $barangList = $order->items->map(function($item) {
+            if ($item->barang) {
+                return $item->barang->nama_barang . ' (' . $item->jumlah . ')';
+            } else {
+                return 'Barang tidak ditemukan (' . $item->jumlah . ')';
+            }
+        })->join(', ');
+
         return [
-            $transaksi->id,
-            $transaksi->customer->nama_customer ?? '-',
-            $transaksi->customer->tipe_pembeli ?? '-',
-            $transaksi->barang->nama_barang ?? '-',
-            $transaksi->jumlah,
-            $transaksi->harga_barang,
-            $transaksi->total_harga,
-            $transaksi->tanggal_pembelian->format('d-m-Y'),
-            $this->formatTipePembayaran($transaksi->tipe_pembayaran),
-            $transaksi->alamat_pengantaran ?? '-',
+            $order->order_id,
+            $order->customer->nama_customer ?? '-',
+            $order->customer->tipe_pembeli ?? '-',
+            $barangList,
+            $order->total_jumlah,
+            $order->total_harga, // Total harga per order
+            $order->total_harga, // Total harga (sama dengan sebelumnya untuk konsistensi)
+            $order->tanggal_pembelian->format('d-m-Y'),
+            $this->formatTipePembayaran($order->tipe_pembayaran),
+            'Selesai',
         ];
     }
 
@@ -134,7 +166,7 @@ class LaporanPenjualanPerBulanSheet implements
             'Total Harga',
             'Tanggal Pembelian',
             'Tipe Pembayaran',
-            'Alamat Pengantaran',
+            'Status',
         ];
     }
 
@@ -146,6 +178,7 @@ class LaporanPenjualanPerBulanSheet implements
     public function columnFormats(): array
     {
         return [
+            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Jumlah
             'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Harga Barang
             'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Total Harga
         ];

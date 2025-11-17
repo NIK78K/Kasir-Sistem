@@ -16,7 +16,7 @@
                 </div>
 
                 <!-- Reset Password Title -->
-                <div class="text-white text-4xl font-bold uppercase tracking-[0.2em] relative z-10 mb-4">RESET PASSWORD</div>
+                <div class="text-white text-4xl font-bold uppercase tracking-[0.2em] relative z-10 mb-4 text-center">RESET PASSWORD</div>
 
                 <!-- Subtitle -->
                 <p class="text-slate-300 text-base relative z-10 text-center">Reset your password to continue</p>
@@ -36,14 +36,7 @@
                     </div>
 
                     <!-- Tab Header -->
-                    <div class="flex justify-end mb-10 gap-2">
-                        <button class="px-4 py-2 text-slate-400 text-xs font-semibold uppercase cursor-default transition-all">
-                            ←
-                        </button>
-                        <button class="px-6 py-2 bg-slate-800 text-white text-xs font-semibold uppercase border-none rounded-lg cursor-default shadow-md">
-                            RESET PASSWORD
-                        </button>
-                    </div>
+                
 
                     <!-- Session Status -->
                     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -120,12 +113,14 @@
                         </div>
 
                         <!-- Reset Password Button -->
-                        <button
-                            type="submit"
-                            class="w-full py-4 bg-slate-800 text-white border-none rounded-xl text-sm font-bold uppercase tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-slate-700 hover:shadow-xl hover:shadow-slate-800/30 active:translate-y-0.5 mt-6"
-                        >
-                            RESET PASSWORD
-                        </button>
+                        <div class="text-center mt-6">
+                            <button
+                                type="submit"
+                                class="py-4 px-8 bg-slate-800 text-white border-none rounded-xl text-sm font-bold uppercase tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-slate-700 hover:shadow-xl hover:shadow-slate-800/30 active:translate-y-0.5"
+                            >
+                                RESET PASSWORD
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>

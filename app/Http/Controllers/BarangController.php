@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Barang;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class BarangController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Barang::query();
+        $query = Barang::active(); // Only show non-deleted items
 
         if ($request->filled('kategori')) {
             $query->where('kategori', $request->kategori);
@@ -21,7 +22,17 @@ class BarangController extends Controller
 
         $barangs = $query->orderBy('created_at', 'desc')->get();
 
-        return view('barang.index', compact('barangs'));
+        // Get all available categories
+        $allCategories = [
+            'Sepeda Pacifik',
+            'Sepeda Listrik',
+            'Ban',
+            'Sepeda Stroller',
+            'Sparepart',
+            'Lainnya'
+        ];
+
+        return view('barang.index', compact('barangs', 'allCategories'));
     }
 
     public function create()
@@ -31,29 +42,51 @@ class BarangController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_barang' => 'required|string|max:255|unique:barangs,nama_barang',
-            'harga' => 'required_without:harga_grosir|nullable|integer|min:0',
-            'harga_grosir' => 'required_without:harga|nullable|integer|min:0',
-            'stok' => 'required|integer|min:0',
-            'kategori' => 'required|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'nama_barang' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('barangs', 'nama_barang')->where(function ($query) {
+                        return $query->where('is_deleted', false);
+                    })
+                ],
+                'harga' => 'required|integer|min:0',
+                'harga_grosir' => 'required|integer|min:0',
+                'stok' => 'required|integer|min:0',
+                'kategori' => 'required|string|max:255',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ], [
+                'nama_barang.required' => 'Nama barang harus diisi.',
+                'nama_barang.unique' => 'Nama barang sudah ada, silakan gunakan nama lain.',
+                'harga.required' => 'Harga retail harus diisi.',
+                'harga_grosir.required' => 'Harga grosir harus diisi.',
+            ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+            $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
 
-        // Convert empty strings to null for nullable fields
-        $data['harga'] = $data['harga'] ?: null;
-        $data['harga_grosir'] = $data['harga_grosir'] ?: null;
+            if ($request->hasFile('gambar')) {
+                $imagePath = $request->file('gambar')->store('barang_images', 'public');
+                $data['gambar'] = $imagePath;
+            }
 
-        if ($request->hasFile('gambar')) {
-            $imagePath = $request->file('gambar')->store('barang_images', 'public');
-            $data['gambar'] = $imagePath;
+            Barang::create($data);
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Barang berhasil ditambahkan']);
+            }
+
+            return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => $e->validator->errors()->first()
+                ], 422);
+            }
+            throw $e;
         }
-
-        Barang::create($data);
-
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan');
     }
 
     public function edit(Barang $barang)
@@ -63,34 +96,87 @@ class BarangController extends Controller
 
     public function update(Request $request, Barang $barang)
     {
-        $request->validate([
-            'nama_barang' => 'required|string|max:255|unique:barangs,nama_barang,' . $barang->id,
-            'harga' => 'required_without:harga_grosir|nullable|integer|min:0',
-            'harga_grosir' => 'required_without:harga|nullable|integer|min:0',
-            'stok' => 'required|integer|min:0',
-            'kategori' => 'required|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        try {
+            $request->validate([
+                'nama_barang' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    Rule::unique('barangs', 'nama_barang')
+                        ->ignore($barang->id)
+                        ->where(function ($query) {
+                            return $query->where('is_deleted', false);
+                        })
+                ],
+                'harga' => 'required|integer|min:0',
+                'harga_grosir' => 'required|integer|min:0',
+                'stok' => 'required|integer|min:0',
+                'kategori' => 'required|string|max:255',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ], [
+                'nama_barang.required' => 'Nama barang harus diisi.',
+                'nama_barang.unique' => 'Nama barang sudah ada, silakan gunakan nama lain.',
+                'harga.required' => 'Harga retail harus diisi.',
+                'harga_grosir.required' => 'Harga grosir harus diisi.',
+            ]);
 
-        $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
+            $data = $request->only('nama_barang', 'harga', 'harga_grosir', 'stok', 'kategori');
 
-        // Convert empty strings to null for nullable fields
-        $data['harga'] = $data['harga'] ?: null;
-        $data['harga_grosir'] = $data['harga_grosir'] ?: null;
+            // Check if there are any changes
+            $hasChanges = false;
+            foreach ($data as $key => $value) {
+                if ($barang->$key != $value) {
+                    $hasChanges = true;
+                    break;
+                }
+            }
 
-        if ($request->hasFile('gambar')) {
-            $imagePath = $request->file('gambar')->store('barang_images', 'public');
-            $data['gambar'] = $imagePath;
+            // Check if new image is uploaded
+            if ($request->hasFile('gambar')) {
+                $hasChanges = true;
+                $imagePath = $request->file('gambar')->store('barang_images', 'public');
+                $data['gambar'] = $imagePath;
+            }
+
+            // If no changes detected, return info message
+            if (!$hasChanges) {
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => true, 
+                        'message' => 'Tidak ada yang diperbarui', 
+                        'no_changes' => true
+                    ], 200);
+                }
+
+                return redirect()->route('barang.index')->with('info', 'Tidak ada yang diperbarui');
+            }
+
+            $barang->update($data);
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Barang berhasil diperbarui']);
+            }
+
+            return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => $e->validator->errors()->first()
+                ], 422);
+            }
+            throw $e;
         }
-
-        $barang->update($data);
-
-        return redirect()->route('barang.index')->with('success', 'Barang berhasil diperbarui');
     }
 
-    public function destroy(Barang $barang)
+    public function destroy(Request $request, Barang $barang)
     {
-        $barang->delete();
+        // Soft delete: set is_deleted to true instead of hard delete
+        $barang->update(['is_deleted' => true]);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Barang berhasil dihapus']);
+        }
 
         return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus');
     }

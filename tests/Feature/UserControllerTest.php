@@ -41,12 +41,13 @@ class UserControllerTest extends TestCase
         $authenticatedUser = User::factory()->create(['role' => 'owner']);
         $this->actingAs($authenticatedUser);
 
+        \Illuminate\Support\Facades\Mail::fake();
+
         $data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
             'role' => 'kasir',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('user.store'), $data);
@@ -60,7 +61,12 @@ class UserControllerTest extends TestCase
         ]);
 
         $user = User::where('email', 'john@example.com')->first();
-        $this->assertTrue(Hash::check('password123', $user->password));
+        $this->assertNotNull($user->invitation_token);
+        $this->assertNotNull($user->invited_at);
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\UserInvitation::class, function ($mail) use ($user) {
+            return $mail->hasTo($user->email);
+        });
     }
 
     public function test_store_fails_with_invalid_data()
@@ -71,14 +77,14 @@ class UserControllerTest extends TestCase
         $data = [
             'name' => '',
             'email' => 'invalid-email',
-            'password' => '123',
             'role' => 'invalid',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('user.store'), $data);
 
         $response->assertRedirect();
-        $response->assertSessionHasErrors(['name', 'email', 'password', 'role']);
+        $response->assertSessionHasErrors(['name', 'email', 'role']);
     }
 
     public function test_store_fails_with_duplicate_email()
@@ -91,9 +97,8 @@ class UserControllerTest extends TestCase
         $data = [
             'name' => 'John Doe',
             'email' => 'john@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
             'role' => 'kasir',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->post(route('user.store'), $data);
@@ -125,9 +130,8 @@ class UserControllerTest extends TestCase
         $data = [
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
-            'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123',
             'role' => 'owner',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('user.update', $user->id), $data);
@@ -140,9 +144,6 @@ class UserControllerTest extends TestCase
             'email' => 'jane@example.com',
             'role' => 'owner',
         ]);
-
-        $updatedUser = User::find($user->id);
-        $this->assertTrue(Hash::check('newpassword123', $updatedUser->password));
     }
 
     public function test_update_without_password_does_not_change_password()
@@ -156,6 +157,7 @@ class UserControllerTest extends TestCase
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
             'role' => 'owner',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('user.update', $user->id), $data);
@@ -179,6 +181,7 @@ class UserControllerTest extends TestCase
             'name' => 'Jane Doe',
             'email' => 'john@example.com',
             'role' => 'kasir',
+            '_token' => csrf_token(),
         ];
 
         $response = $this->put(route('user.update', $user2->id), $data);
@@ -193,11 +196,46 @@ class UserControllerTest extends TestCase
         $this->actingAs($authenticatedUser);
 
         $user = User::factory()->create();
-  
-        $response = $this->delete(route('user.destroy', $user->id));
+
+        $response = $this->delete(route('user.destroy', $user->id), ['_token' => csrf_token()]);
 
         $response->assertRedirect(route('user.index'));
         $response->assertSessionHas('success');
         $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function test_activate_shows_activation_form()
+    {
+        $user = User::factory()->create(['invitation_token' => 'valid-token']);
+
+        $response = $this->get(route('user.activate', 'valid-token'));
+
+        $response->assertStatus(200);
+        $response->assertViewHas('user', $user);
+    }
+
+    public function test_activate_store_activates_user()
+    {
+        $user = User::factory()->create([
+            'invitation_token' => 'valid-token',
+            'password' => Hash::make('oldpassword')
+        ]);
+
+        $data = [
+            'token' => 'valid-token',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+            '_token' => csrf_token(),
+        ];
+
+        $response = $this->post(route('user.activate.store'), $data);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status');
+
+        $user->refresh();
+        $this->assertNull($user->invitation_token);
+        $this->assertNotNull($user->email_verified_at);
+        $this->assertTrue(Hash::check('newpassword123', $user->password));
     }
 }

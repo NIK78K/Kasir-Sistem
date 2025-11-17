@@ -22,8 +22,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+
+
 Route::middleware(['auth', 'role:kasir'])->group(function () {
-    Route::resource('barang', BarangController::class);
     Route::resource('customer', CustomerController::class);
     Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::post('transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
@@ -33,24 +34,28 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::post('transaksi/confirm-order', [TransaksiController::class, 'confirmOrder'])->name('transaksi.confirmOrder');
     Route::get('transaksi/confirm', [TransaksiController::class, 'confirm'])->name('transaksi.confirm');
     Route::get('transaksi/export-pdf', [TransaksiController::class, 'exportPdf'])->name('transaksi.exportPdf');
-    Route::get('transaksi/batal', function () {
-        return redirect()->route('transaksi.listBatal');
-    });
-    Route::post('transaksi/batal', [TransaksiController::class, 'batal'])->name('transaksi.batal');
-    Route::get('transaksi/batal-list/{id?}', [TransaksiController::class, 'listBatal'])->name('transaksi.listBatal');
+
     Route::get('barang-return', [TransaksiController::class, 'listReturnableTransaksi'])->name('transaksi.listReturnable');
     Route::get('barang-return/{id}', [TransaksiController::class, 'barangReturn'])->name('transaksi.barangReturn');
     Route::post('barang-return/{id}', [TransaksiController::class, 'return'])->name('transaksi.return');
 });
 
 Route::middleware(['auth', 'role:owner'])->group(function () {
-    Route::get('data-barang', [OwnerController::class, 'dataBarang'])->name('owner.dataBarang');
-    Route::get('data-customer', [OwnerController::class, 'dataCustomer'])->name('owner.dataCustomer');
+    Route::get('barang', [BarangController::class, 'index'])->name('barang.index');
+    Route::post('barang', [BarangController::class, 'store'])->name('barang.store');
+    Route::put('barang/{barang}', [BarangController::class, 'update'])->name('barang.update');
+    Route::delete('barang/{barang}', [BarangController::class, 'destroy'])->name('barang.destroy');
+    Route::match(['GET', 'POST'], 'data-customer', [OwnerController::class, 'dataCustomer'])->name('owner.dataCustomer');
     Route::resource('user', UserController::class);
 
     Route::get('laporan-penjualan', [OwnerController::class, 'laporanPenjualan'])->name('owner.laporanPenjualan');
     Route::get('laporan-penjualan/export', [OwnerController::class, 'laporanPenjualanExport'])->name('owner.laporanPenjualanExport');
     Route::get('laporan-barang-return', [OwnerController::class, 'laporanBarangReturn'])->name('owner.laporanBarangReturn');
+    Route::get('dashboard/chart-data', [OwnerController::class, 'chartData'])->name('dashboard.chartData');
 });
+
+// Routes for user activation (public routes)
+Route::get('user/activate/{token}', [UserController::class, 'activate'])->name('user.activate');
+Route::post('user/activate', [UserController::class, 'activateStore'])->name('user.activate.store');
 
 require __DIR__.'/auth.php';

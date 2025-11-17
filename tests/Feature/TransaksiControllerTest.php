@@ -52,6 +52,7 @@ class TransaksiControllerTest extends TestCase
         $response = $this->post(route('transaksi.addToCart'), [
             'barang_id' => $barang->id,
             'jumlah' => 2,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect(route('transaksi.index'));
@@ -71,6 +72,7 @@ class TransaksiControllerTest extends TestCase
         $response = $this->post(route('transaksi.addToCart'), [
             'barang_id' => $barang->id,
             'jumlah' => 2,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -96,6 +98,7 @@ class TransaksiControllerTest extends TestCase
         $response = $this->post(route('transaksi.addToCart'), [
             'barang_id' => $barang->id,
             'jumlah' => 2,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -119,11 +122,13 @@ class TransaksiControllerTest extends TestCase
         $this->post(route('transaksi.addToCart'), [
             'barang_id' => $barang->id,
             'jumlah' => 2,
+            '_token' => csrf_token(),
         ]);
 
         $this->post(route('transaksi.addToCart'), [
             'barang_id' => $barang->id,
             'jumlah' => 3,
+            '_token' => csrf_token(),
         ]);
 
         $cart = session('cart');
@@ -139,7 +144,7 @@ class TransaksiControllerTest extends TestCase
         $cart = [['barang_id' => 1, 'nama_barang' => 'Test', 'harga' => 10000, 'tipe_harga' => 'biasa', 'jumlah' => 2]];
         Session::put('cart', $cart);
 
-        $response = $this->delete(route('transaksi.removeFromCart', 0));
+        $response = $this->delete(route('transaksi.removeFromCart', 0), ['_token' => csrf_token()]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
@@ -154,6 +159,7 @@ class TransaksiControllerTest extends TestCase
         $response = $this->post(route('transaksi.confirmOrder'), [
             'tipe_pembayaran' => 'tunai',
             'uang_dibayar' => 10000,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -171,6 +177,7 @@ class TransaksiControllerTest extends TestCase
             'customer_id' => $customer->id,
             'tipe_pembayaran' => 'tunai',
             'uang_dibayar' => 10000,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -202,10 +209,13 @@ class TransaksiControllerTest extends TestCase
             'customer_id' => $customer->id,
             'tipe_pembayaran' => 'tunai',
             'uang_dibayar' => 25000,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect(route('transaksi.confirm'));
         $response->assertSessionHas('success');
+
+        $transaksi = Transaksi::where('customer_id', $customer->id)->first();
 
         $this->assertDatabaseHas('transaksis', [
             'customer_id' => $customer->id,
@@ -217,6 +227,10 @@ class TransaksiControllerTest extends TestCase
             'kembalian' => 5000,
             'status' => 'selesai',
         ]);
+
+        // Assert order_id is generated and starts with 'ORD-'
+        $this->assertNotNull($transaksi->order_id);
+        $this->assertStringStartsWith('ORD-', $transaksi->order_id);
 
         $barang->refresh();
         $this->assertEquals(8, $barang->stok);
@@ -247,6 +261,7 @@ class TransaksiControllerTest extends TestCase
             'customer_id' => $customer->id,
             'tipe_pembayaran' => 'tunai',
             'uang_dibayar' => 50000,
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -278,8 +293,8 @@ class TransaksiControllerTest extends TestCase
         $response = $this->get(route('transaksi.listReturnable'));
 
         $response->assertStatus(200);
-        $response->assertViewHas('transaksis');
-        $this->assertCount(1, $response->viewData('transaksis'));
+        $response->assertViewHas('orders');
+        $this->assertCount(1, $response->viewData('orders'));
     }
 
     public function test_store_creates_transaction()
@@ -297,10 +312,13 @@ class TransaksiControllerTest extends TestCase
             'tipe_pembayaran' => 'tunai',
             'tanggal_pembelian' => now()->format('Y-m-d'),
             'alamat_pengantaran' => 'Test Address',
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect(route('transaksi.index'));
         $response->assertSessionHas('success');
+
+        $transaksi = Transaksi::where('customer_id', $customer->id)->first();
 
         $this->assertDatabaseHas('transaksis', [
             'customer_id' => $customer->id,
@@ -310,6 +328,10 @@ class TransaksiControllerTest extends TestCase
             'total_harga' => 20000,
             'status' => 'selesai',
         ]);
+
+        // Assert order_id is generated and starts with 'ORD-'
+        $this->assertNotNull($transaksi->order_id);
+        $this->assertStringStartsWith('ORD-', $transaksi->order_id);
 
         $barang->refresh();
         $this->assertEquals(8, $barang->stok);
@@ -329,63 +351,14 @@ class TransaksiControllerTest extends TestCase
             'jumlah' => 5,
             'tipe_pembayaran' => 'tunai',
             'tanggal_pembelian' => now()->format('Y-m-d'),
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHasErrors('jumlah');
     }
 
-    public function test_batal_cancels_transaction()
-    {
-        $user = \App\Models\User::factory()->create(['role' => 'kasir']);
-        $this->actingAs($user);
 
-        $transaksi = Transaksi::factory()->create(['status' => 'selesai', 'jumlah' => 2]);
-        $barang = $transaksi->barang;
-        $originalStok = $barang->stok;
-        $barang->decrement('stok', 2); // Simulate stock reduction
-
-        $response = $this->post(route('transaksi.batal'), [
-            'transaksi_id' => $transaksi->id,
-            'confirm_batal' => '1',
-        ]);
-
-        $response->assertRedirect(route('transaksi.listBatal'));
-        $response->assertSessionHas('success');
-
-        $transaksi->refresh();
-        $this->assertEquals('batal', $transaksi->status);
-
-        $barang->refresh();
-        $this->assertEquals($originalStok, $barang->stok); // Stock restored
-    }
-
-    public function test_list_batal_shows_form_for_specific_transaction()
-    {
-        $user = \App\Models\User::factory()->create(['role' => 'kasir']);
-        $this->actingAs($user);
-
-        $transaksi = Transaksi::factory()->create(['status' => 'selesai']);
-
-        $response = $this->get(route('transaksi.listBatal', $transaksi->id));
-
-        $response->assertStatus(200);
-        $response->assertViewHas('transaksi', $transaksi);
-    }
-
-    public function test_list_batal_shows_list_of_transactions()
-    {
-        $user = \App\Models\User::factory()->create(['role' => 'kasir']);
-        $this->actingAs($user);
-
-        Transaksi::factory()->count(2)->create(['status' => 'selesai']);
-
-        $response = $this->get(route('transaksi.listBatal'));
-
-        $response->assertStatus(200);
-        $response->assertViewHas('transaksis');
-        $this->assertCount(2, $response->viewData('transaksis'));
-    }
 
     public function test_barang_return_shows_form()
     {
@@ -405,7 +378,7 @@ class TransaksiControllerTest extends TestCase
         $user = \App\Models\User::factory()->create(['role' => 'kasir']);
         $this->actingAs($user);
 
-        $transaksi = Transaksi::factory()->create(['status' => 'selesai', 'jumlah' => 5]);
+        $transaksi = Transaksi::factory()->create(['status' => 'selesai', 'jumlah' => 5, 'order_id' => 'ORD-20251107-0123']);
         $barang = $transaksi->barang;
         $originalStok = $barang->stok;
         $barang->decrement('stok', 5);
@@ -419,16 +392,23 @@ class TransaksiControllerTest extends TestCase
                 ]
             ],
             'alasan_return' => 'Test reason',
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $transaksi->refresh();
-        $this->assertEquals('return_partial', $transaksi->status);
+        $this->assertEquals('selesai', $transaksi->status);
+
+        // Assert that a new return transaction is created with the same order_id
+        $returnTransaksi = Transaksi::where('parent_transaksi_id', $transaksi->id)->first();
+        $this->assertNotNull($returnTransaksi);
+        $this->assertEquals('ORD-20251107-0123', $returnTransaksi->order_id);
+        $this->assertEquals('return_partial', $returnTransaksi->status);
 
         $barang->refresh();
-        $this->assertEquals($originalStok - 3, $barang->stok); // Stock decreased by purchase amount, increased by return amount: 10 - 5 + 2 = 7, but wait, original is random
+        $this->assertEquals($originalStok - 3, $barang->stok); // Stock decreased by purchase amount, increased by return amount: original - 5 + 2 = original - 3
     }
 
     public function test_return_processes_full_return()
@@ -450,6 +430,7 @@ class TransaksiControllerTest extends TestCase
                 ]
             ],
             'alasan_return' => 'Test reason',
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -477,6 +458,7 @@ class TransaksiControllerTest extends TestCase
                     'jumlah_return' => 1,
                 ]
             ],
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();

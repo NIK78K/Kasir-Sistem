@@ -5,6 +5,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto p-6">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Konfirmasi Pesanan</h1>
+    <h2 class="sr-only">Ringkasan Pesanan dan Pembayaran</h2>
 
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Detail Customer</h2>
@@ -16,26 +17,28 @@
 
     <div class="bg-white shadow-md rounded-lg p-6 mb-6">
         <h2 class="text-xl font-semibold mb-4">Detail Pesanan</h2>
-        <table class="w-full border-collapse">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border px-4 py-2">Barang</th>
-                    <th class="border px-4 py-2">Jumlah</th>
-                    <th class="border px-4 py-2">Harga Satuan</th>
-                    <th class="border px-4 py-2">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transaksis as $transaksi)
-                    <tr>
-                        <td class="border px-4 py-2">{{ $transaksi->barang->nama_barang }}</td>
-                        <td class="border px-4 py-2">{{ $transaksi->jumlah }}</td>
-                        <td class="border px-4 py-2">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
-                        <td class="border px-4 py-2">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Barang</th>
+                        <th class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Jumlah</th>
+                        <th class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Harga Satuan</th>
+                        <th class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Total</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach($transaksis as $transaksi)
+                        <tr>
+                            <td class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">{{ $transaksi->barang->nama_barang }}</td>
+                            <td class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">{{ $transaksi->jumlah }}</td>
+                            <td class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Rp {{ number_format($transaksi->harga_barang, 0, ',', '.') }}</td>
+                            <td class="border px-2 py-2 text-sm md:px-4 md:py-2 md:text-base">Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
         <div class="text-right mt-4 font-bold text-lg">
             Total: Rp {{ number_format($total, 0, ',', '.') }}
         </div>

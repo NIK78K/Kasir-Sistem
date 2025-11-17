@@ -15,7 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('nama_customer');
         $table->string('alamat')->nullable();
-        $table->enum('tipe_pembeli', ['pembeli', 'bengkel', 'langganan']);
+        $table->enum('tipe_pembeli', ['pembeli', 'bengkel_langganan']);
         $table->timestamps();
     });
 }

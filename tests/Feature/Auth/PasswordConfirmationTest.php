@@ -25,6 +25,7 @@ class PasswordConfirmationTest extends TestCase
 
         $response = $this->actingAs($user)->post('/confirm-password', [
             'password' => 'password',
+            '_token' => csrf_token(),
         ]);
 
         $response->assertRedirect();
@@ -37,6 +38,7 @@ class PasswordConfirmationTest extends TestCase
 
         $response = $this->actingAs($user)->post('/confirm-password', [
             'password' => 'wrong-password',
+            '_token' => csrf_token(),
         ]);
 
         $response->assertSessionHasErrors();
