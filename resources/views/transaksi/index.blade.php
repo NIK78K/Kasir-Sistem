@@ -3,13 +3,13 @@
 @section('title', 'Transaksi')
 
 @section('content')
-    <div class="flex flex-col h-screen overflow-hidden">
+    <div class="flex flex-col h-[calc(100vh-4rem)] overflow-hidden">
         <!-- Accessible page heading (hidden) -->
         <h1 class="sr-only">Transaksi</h1>
         {{-- Main Content: 2 Column Layout --}}
         <div class="flex-1 flex flex-col lg:flex-row gap-0 bg-gray-100 overflow-hidden">
             {{-- Left Column: Products Section - Scrollable --}}
-            <div class="flex-1 overflow-y-auto bg-white order-1 lg:order-1">
+            <div class="flex-1 overflow-y-auto bg-white order-1 lg:order-1 lg:h-full h-[45vh]">
                 {{-- Search & Filter Section --}}
                 <div class="p-4 lg:p-6 bg-white border-b border-gray-200">
                     <form method="GET" action="{{ route('transaksi.index') }}" id="filter-form" class="space-y-3">
@@ -176,9 +176,9 @@
             </div>
 
             {{-- Right Column: Cart & Checkout Section - Dark Theme --}}
-            <div class="w-full lg:w-[420px] flex flex-col bg-gradient-to-b from-slate-700 via-slate-800 to-slate-900 order-2 lg:order-2 shadow-2xl lg:sticky lg:top-0 lg:max-h-screen max-h-[60vh]">
+            <div class="w-full lg:w-[420px] lg:flex-shrink-0 flex flex-col bg-gradient-to-b from-slate-700 via-slate-800 to-slate-900 order-2 lg:order-2 shadow-2xl h-[55vh] lg:h-full overflow-hidden">
                 {{-- Cart Header --}}
-                <div class="px-5 py-4 border-b border-slate-600/50 flex-shrink-0">
+                <div class="px-5 py-3 border-b border-slate-600/50 flex-shrink-0">
                     <div class="flex items-center justify-between">
                         <h2 class="text-xl font-bold text-white flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -194,14 +194,14 @@
 
                 {{-- Customer Info --}}
                 @if($customer)
-                <div class="px-5 py-4 bg-slate-700/50 border-b border-slate-600/50 flex-shrink-0">
+                <div class="px-5 py-3 bg-slate-700/50 border-b border-slate-600/50 flex-shrink-0">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-base shadow-lg">
                             {{ substr($customer->nama_customer, 0, 1) }}
                         </div>
                         <div class="flex-1">
-                            <p class="text-base font-bold text-white">{{ $customer->nama_customer }}</p>
-                            <p class="text-sm text-slate-300">{{ $customer->tipe_pembeli == 'bengkel_langganan' || $customer->tipe_pembeli == 'bengkel' || $customer->tipe_pembeli == 'langganan' ? 'Bengkel Langganan' : 'Pembeli' }}</p>
+                            <p class="text-sm font-bold text-white">{{ $customer->nama_customer }}</p>
+                            <p class="text-xs text-slate-300">{{ $customer->tipe_pembeli == 'bengkel_langganan' || $customer->tipe_pembeli == 'bengkel' || $customer->tipe_pembeli == 'langganan' ? 'Bengkel Langganan' : 'Pembeli' }}</p>
                         </div>
                     </div>
                 </div>
@@ -216,10 +216,10 @@
                                 $itemTotal = $item['harga'] * $item['jumlah'];
                                 $total += $itemTotal;
                             @endphp
-                            <div class="border-b border-slate-600/30 p-4 hover:bg-slate-700/30 transition">
-                                <div class="flex gap-3">
+                            <div class="border-b border-slate-600/30 p-3 lg:p-4 hover:bg-slate-700/30 transition">
+                                <div class="flex gap-2 lg:gap-3">
                                     {{-- Item Image --}}
-                                    <div class="w-16 h-16 bg-slate-600/50 rounded-lg flex-shrink-0 overflow-hidden">
+                                    <div class="w-12 h-12 lg:w-16 lg:h-16 bg-slate-600/50 rounded-lg flex-shrink-0 overflow-hidden">
                                         @if(isset($item['gambar']) && $item['gambar'])
                                             @php 
                                                 $webpCart = preg_replace('/\.(jpe?g|png)$/i', '.webp', $item['gambar']);
@@ -245,34 +245,34 @@
                                     </div>
                                     {{-- Item Details --}}
                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-bold text-white mb-1">{{ $item['nama_barang'] }}</p>
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="px-2 py-0.5 text-xs font-bold rounded {{ $item['tipe_harga'] == 'grosir' ? 'bg-blue-500 text-white' : 'bg-green-500 text-white' }}">
+                                        <p class="text-xs lg:text-sm font-bold text-white mb-1 line-clamp-1">{{ $item['nama_barang'] }}</p>
+                                        <div class="flex items-center gap-2 mb-1 lg:mb-2">
+                                            <span class="px-1.5 lg:px-2 py-0.5 text-[10px] lg:text-xs font-bold rounded {{ $item['tipe_harga'] == 'grosir' ? 'bg-blue-500 text-white' : 'bg-green-500 text-white' }}">
                                                 {{ ucfirst($item['tipe_harga']) }}
                                             </span>
                                         </div>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm text-slate-300">Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
-                                            <span class="text-base font-bold text-green-400">Rp {{ number_format($itemTotal, 0, ',', '.') }}</span>
+                                        <div class="flex items-center justify-between mb-1 lg:mb-0">
+                                            <span class="text-xs lg:text-sm text-slate-300">Rp {{ number_format($item['harga'], 0, ',', '.') }}</span>
+                                            <span class="text-sm lg:text-base font-bold text-green-400">Rp {{ number_format($itemTotal, 0, ',', '.') }}</span>
                                         </div>
-                                        <div class="flex items-center justify-between mt-3">
+                                        <div class="flex items-center justify-between mt-2 lg:mt-3">
                                             {{-- Quantity Controls --}}
-                                            <div class="flex items-center gap-2 bg-slate-600/50 rounded-lg p-1">
-                                                <button class="btn-decrease-qty w-8 h-8 flex items-center justify-center rounded-md bg-red-500 text-white hover:bg-red-600 transition" data-index="{{ $index }}">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div class="flex items-center gap-1 lg:gap-2 bg-slate-600/50 rounded-lg p-0.5 lg:p-1">
+                                                <button class="btn-decrease-qty w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center rounded-md bg-red-500 text-white hover:bg-red-600 transition" data-index="{{ $index }}">
+                                                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                                     </svg>
                                                 </button>
-                                                <span class="w-10 text-center text-base font-bold text-white">{{ $item['jumlah'] }}</span>
-                                                <button class="btn-increase-qty w-8 h-8 flex items-center justify-center rounded-md bg-green-500 text-white hover:bg-green-600 transition" data-index="{{ $index }}">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <span class="w-8 lg:w-10 text-center text-sm lg:text-base font-bold text-white">{{ $item['jumlah'] }}</span>
+                                                <button class="btn-increase-qty w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center rounded-md bg-green-500 text-white hover:bg-green-600 transition" data-index="{{ $index }}">
+                                                    <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                                                     </svg>
                                                 </button>
                                             </div>
                                             {{-- Delete Button --}}
-                                            <button type="button" class="btn-remove-item w-8 h-8 flex items-center justify-center rounded-md bg-red-500/80 text-white hover:bg-red-600 transition" data-index="{{ $index }}">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <button type="button" class="btn-remove-item w-6 h-6 lg:w-8 lg:h-8 flex items-center justify-center rounded-md bg-red-500/80 text-white hover:bg-red-600 transition" data-index="{{ $index }}">
+                                                <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
                                                 </svg>
                                             </button>
@@ -294,22 +294,22 @@
 
                 {{-- Checkout Section - Sticky Bottom --}}
                 @if(count(session('cart', [])) > 0)
-                <div class="border-t border-slate-600/50 p-5 bg-slate-800 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
+                <div class="border-t border-slate-600/50 p-4 bg-slate-800 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
                     {{-- Summary --}}
-                    <div class="space-y-2 mb-4">
+                    <div class="space-y-1.5 mb-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-slate-300">Subtotal:</span>
                             <span class="font-semibold text-white">Rp {{ isset($total) ? number_format($total, 0, ',', '.') : '0' }}</span>
                         </div>
-                        <div class="border-t border-slate-600/50 pt-3 flex justify-between items-center">
+                        <div class="border-t border-slate-600/50 pt-2 flex justify-between items-center">
                             <span class="text-base font-bold text-white">TOTAL:</span>
-                            <span class="text-2xl font-bold text-green-400">Rp {{ isset($total) ? number_format($total, 0, ',', '.') : '0' }}</span>
+                            <span class="text-xl font-bold text-green-400">Rp {{ isset($total) ? number_format($total, 0, ',', '.') : '0' }}</span>
                         </div>
                     </div>
 
                     {{-- Checkout Button - ALWAYS VISIBLE --}}
                     <button type="button" onclick="openPaymentModal()" id="checkout-btn"
-                        class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3.5 rounded-xl hover:from-green-600 hover:to-green-700 transition font-bold text-base shadow-xl flex items-center justify-center gap-2"
+                        class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-green-700 transition font-bold text-sm shadow-xl flex items-center justify-center gap-2"
                         style="display: flex !important; visibility: visible !important;">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
