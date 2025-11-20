@@ -85,7 +85,7 @@
     <!-- Footer -->
     <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 2px dashed #ccc;">
         <p style="margin: 0; font-size: 14px; font-weight: bold;">Terima Kasih Atas Pembelian Anda!</p>
-        <p style="margin: 5px 0 0 0; font-size: 11px;">Belanja lagi ya wkwkwk</p>
+        <p style="margin: 5px 0 0 0; font-size: 11px;">Belanja Kembali Ya :D</p>
     </div>
 
 </body>

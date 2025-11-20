@@ -43,7 +43,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
                             </span>
-                            <input type="text" name="search_barang" placeholder="Cari produk berdasarkan nama, kode, atau barcode..." value="{{ request('search_barang') }}"
+                            <input type="text" name="search_barang" placeholder="Cari Barang" value="{{ request('search_barang') }}"
                                 class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                         </div>
 
@@ -156,7 +156,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                                 </svg>
                             </div>
-                            <h2 class="text-xl font-bold text-gray-700 mb-2">Tidak Ada Produk Tersedia</h2>
+                            <h2 class="text-xl font-bold text-gray-700 mb-2">Barang Tidak Tersedia</h2>
                             @if(request('kategori'))
                                 <p class="text-gray-500 text-center">
                                     Tidak ada produk dalam kategori <span class="font-semibold">"{{ request('kategori') }}"</span>.
