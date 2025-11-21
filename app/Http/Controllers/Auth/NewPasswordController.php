@@ -34,6 +34,8 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'password.confirmed' => 'Password tidak sama.',
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we
