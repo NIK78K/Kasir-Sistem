@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Undangan Aktivasi Akun</title>
+    <title>Reset Password</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -83,26 +83,16 @@
             line-height: 1.8;
             margin-bottom: 16px;
         }
-        .role-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            margin: 4px 0;
-        }
         .info-box {
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-left: 4px solid #0ea5e9;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
             padding: 20px;
             border-radius: 8px;
             margin: 24px 0;
         }
         .info-box p {
             margin: 0;
-            color: #0c4a6e;
+            color: #92400e;
             font-size: 14px;
             line-height: 1.6;
         }
@@ -183,27 +173,26 @@
     <div class="email-wrapper">
         <div class="header">
             <div class="logo">AK</div>
-            <h1>Undangan Aktivasi Akun</h1>
+            <h1>Reset Password</h1>
             <p>Sistem Anugrah Mandiri Kasir</p>
         </div>
         <div class="content">
-            <p class="greeting">Halo {{ $user->name }}! 👋</p>
+            <p class="greeting">Halo! 👋</p>
             
             <p class="message">
-                Selamat! Anda telah diundang untuk bergabung dengan tim kami sebagai 
-                <span class="role-badge">{{ ucfirst($user->role) }}</span>
-                di Sistem Kasir AMKAS.
+                Anda menerima email ini karena kami menerima permintaan reset password untuk akun Anda.
             </p>
+            
             <div class="button-container">
-                <a href="{{ $activationUrl }}" class="button">
-                    🔐 Aktifkan Akun Sekarang
+                <a href="{{ $resetUrl }}" class="button">
+                    🔐 Reset Password
                 </a>
             </div>
-
+            
             <div class="info-box">
                 <p>
-                    <strong>📋 Yang perlu Anda lakukan:</strong><br>
-                    Klik tombol aktivasi di bawah ini untuk membuat password dan mengaktifkan akun Anda secara otomatis.
+                    <strong>⚠️ Penting:</strong><br>
+                    Link reset password ini akan kadaluarsa dalam 60 menit. Silakan segera reset password Anda.
                 </p>
             </div>
             
@@ -213,9 +202,9 @@
                 <strong>ℹ️ Informasi Penting:</strong>
             </p>
             <p class="message">
-                • Link aktivasi ini hanya berlaku untuk satu kali penggunaan<br>
-                • Setelah aktivasi, Anda dapat langsung menggunakan sistem<br>
-                • Jika Anda tidak merasa meminta undangan ini, abaikan email ini
+                • Link ini hanya dapat digunakan satu kali<br>
+                • Jika Anda tidak meminta reset password, abaikan email ini<br>
+                • Password Anda tidak akan berubah sampai Anda membuat password baru
             </p>
             
             <div class="divider"></div>
@@ -224,7 +213,7 @@
                 Jika tombol di atas tidak berfungsi, salin dan tempel URL berikut ke browser Anda:
             </p>
             <p class="message" style="word-break: break-all; color: #0ea5e9; font-size: 13px;">
-                {{ $activationUrl }}
+                {{ $resetUrl }}
             </p>
         </div>
         <div class="footer">
