@@ -210,6 +210,8 @@ class UserController extends Controller
         $request->validate([
             'token' => 'required',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'password.confirmed' => 'Password tidak sama.',
         ]);
 
         $user = User::where('invitation_token', $request->token)->first();

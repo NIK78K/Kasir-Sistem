@@ -37,7 +37,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </span>
-                    <input type="text" name="search" placeholder="Cari berdasarkan No. Transaksi, Customer, Barang, atau Alasan Return" value="{{ request('search') }}"
+                    <input type="text" name="search" placeholder="Cari berdasarkan No. Transaksi, Customer atau Barang," value="{{ request('search') }}"
                         class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                 </div>
 
