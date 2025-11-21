@@ -19,7 +19,7 @@
 
 
     </head>
-    <body class="font-sans antialiased m-0 p-0 bg-gradient-to-br from-gray-600 to-gray-800 min-h-screen flex items-center justify-center">
+    <body class="font-sans antialiased m-0 p-0 bg-gradient-to-br from-gray-600 to-gray-800 min-h-screen flex items-center justify-center px-4">
         {{ $slot }}
     </body>
 </html>
