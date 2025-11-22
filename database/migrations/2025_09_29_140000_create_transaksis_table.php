@@ -17,7 +17,6 @@ class CreateTransaksisTable extends Migration
             $table->decimal('total_harga', 15, 2);
             $table->date('tanggal_pembelian');
             $table->string('tipe_pembayaran');
-            $table->string('alamat_pengantaran')->nullable();
             $table->timestamps();
         });
     }
