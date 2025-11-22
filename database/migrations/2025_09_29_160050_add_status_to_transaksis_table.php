@@ -12,7 +12,7 @@ return new class extends Migration
 public function up()
 {
     Schema::table('transaksis', function (Blueprint $table) {
-        $table->string('status')->default('selesai')->after('alamat_pengantaran');
+        $table->string('status')->default('selesai');
     });
 }
 
