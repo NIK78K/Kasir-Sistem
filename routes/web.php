@@ -29,6 +29,9 @@ Route::middleware(['auth', 'role:kasir'])->group(function () {
     Route::get('transaksi', [TransaksiController::class, 'index'])->name('transaksi.index');
     Route::post('transaksi/store', [TransaksiController::class, 'store'])->name('transaksi.store');
     Route::post('transaksi/add-to-cart', [TransaksiController::class, 'addToCart'])->name('transaksi.addToCart');
+    Route::get('transaksi/add-to-cart', function() {
+        return redirect()->route('transaksi.index')->with('error', 'Akses tidak diizinkan. Gunakan tombol tambah ke keranjang.');
+    });
     Route::delete('transaksi/remove-from-cart/{index}', [TransaksiController::class, 'removeFromCart'])->name('transaksi.removeFromCart');
     Route::post('transaksi/update-cart-quantity/{index}', [TransaksiController::class, 'updateCartQuantity'])->name('transaksi.updateCartQuantity');
     Route::post('transaksi/confirm-order', [TransaksiController::class, 'confirmOrder'])->name('transaksi.confirmOrder');
