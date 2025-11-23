@@ -38,6 +38,7 @@ jobs:
 
       - name: Create deployment archive
         run: |
+          # 1. Buat arsip di folder /tmp agar tidak error 'file changed'
           tar -czf /tmp/deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
@@ -49,9 +50,11 @@ jobs:
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
             .
+          
+          # 2. Pindahkan file dari /tmp ke folder kerja saat ini agar bisa di-upload
           mv /tmp/deployment.tar.gz ./deployment.tar.gz
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS (Upload)
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -61,7 +64,7 @@ jobs:
           source: "deployment.tar.gz"
           target: "/tmp/"
 
-      - name: Execute deployment script
+      - name: Execute deployment script (SSH)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -73,13 +76,12 @@ jobs:
             PROJECT_PATH="/var/www/Kasir-Sistem"
             cd $PROJECT_PATH
             
-            # 1. Backup versi lama (Simpan di folder home user agar aman dari permission error)
+            # 1. Backup versi lama (Simpan di folder home user agar aman)
             timestamp=$(date +%Y%m%d_%H%M%S)
             BACKUP_DIR="$HOME/backups/kasir-sistem"
             mkdir -p $BACKUP_DIR
             
-            # Backup folder project saat ini
-            echo "📦 Membuat Backup..."
+            echo "📦 Membuat Backup ke $BACKUP_DIR..."
             tar -czf "$BACKUP_DIR/backup_$timestamp.tar.gz" . --exclude=node_modules 2>/dev/null || true
             
             # 2. Ekstrak versi baru dari GitHub
@@ -87,15 +89,13 @@ jobs:
             tar -xzf /tmp/deployment.tar.gz -C .
             rm /tmp/deployment.tar.gz
             
-            # 3. Atur Permission (PENTING!)
-            # Folder storage harus bisa ditulisi oleh www-data (Nginx)
+            # 3. Atur Permission
             echo "wm Mengatur Izin Akses..."
             chmod -R 775 storage bootstrap/cache
             
-            # Jika user amkas6 bisa sudo tanpa password, uncomment baris bawah ini:
+            # Opsional: Jika user amkas6 punya akses sudo tanpa password
             # sudo chown -R www-data:www-data $PROJECT_PATH
-            # Jika tidak bisa sudo, pastikan group permission (775) sudah cukup.
-
+            
             # 4. Update Database & Laravel
             echo "🚀 Menjalankan Migrasi & Cache..."
             php artisan migrate --force
@@ -106,3 +106,13 @@ jobs:
             php artisan view:cache
             
             echo "✅ Deployment Selesai! Versi $timestamp tersimpan."
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Deployment successful!"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi
