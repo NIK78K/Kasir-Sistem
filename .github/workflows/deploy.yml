@@ -122,32 +122,30 @@ jobs:
             # Backup .env
             cp .env .env.backup 2>/dev/null || true
             
-            # Clean old files (kecuali storage dan .env)
+            # Clean old files LEBIH AGRESIF (kecuali storage dan .env)
             echo "Cleaning old files..."
-            find . -mindepth 1 -maxdepth 1 \
-              ! -name 'storage' \
-              ! -name '.env' \
-              ! -name '.env.backup' \
-              -exec rm -rf {} + 2>/dev/null || true
+            rm -rf app/
+            rm -rf bootstrap/
+            rm -rf config/
+            rm -rf database/
+            rm -rf public/
+            rm -rf resources/
+            rm -rf routes/
+            rm -rf vendor/
+            rm -f *.php
+            rm -f *.json
+            rm -f *.js
+            rm -f *.md
             
-            # Extract new files (skip storage folders yang sudah ada)
+            # Extract new files dengan overwrite
             echo "Extracting new files..."
-            tar -xzf /tmp/deployment.tar.gz \
-              --exclude='storage/framework/cache' \
-              --exclude='storage/framework/sessions' \
-              --exclude='storage/framework/views' \
-              --exclude='storage/framework/testing' \
-              --exclude='storage/logs' \
-              --exclude='storage/app/public' \
-              -C . 2>/dev/null || true
+            tar -xzf /tmp/deployment.tar.gz --overwrite -C .
             
             rm -f /tmp/deployment.tar.gz
             
             # Restore .env
-            if [ ! -f .env ] && [ -f .env.backup ]; then
+            if [ -f .env.backup ]; then
               mv .env.backup .env
-            else
-              rm -f .env.backup
             fi
             
             # Fix permissions SEBELUM run artisan
@@ -160,12 +158,17 @@ jobs:
             echo "Running migrations..."
             php artisan migrate --force
             
-            echo "Clearing all caches..."
-            php artisan cache:clear
-            php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
-            php artisan optimize:clear
+            echo "Clearing all caches AGGRESSIVELY..."
+            php artisan cache:clear || true
+            php artisan config:clear || true
+            php artisan route:clear || true
+            php artisan view:clear || true
+            php artisan optimize:clear || true
+            
+            # Hapus cache files manually
+            rm -rf storage/framework/cache/data/* || true
+            rm -rf storage/framework/views/* || true
+            rm -rf bootstrap/cache/*.php || true
             
             echo "Rebuilding caches..."
             php artisan config:cache
@@ -180,6 +183,11 @@ jobs:
             # Reload nginx
             echo "Reloading Nginx..."
             sudo systemctl reload nginx || true
+            
+            # Verify deployment
+            echo "Verifying files..."
+            ls -lh public/index.php
+            head -5 routes/web.php
             
             # Set ownership ke www-data setelah artisan selesai
             echo "Final permission setup..."
