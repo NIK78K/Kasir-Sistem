@@ -31,7 +31,7 @@
                         
                         <!-- Tagline -->
                         <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-300 font-medium mb-2 sm:mb-3 animate-fade-in animation-delay-400 animation-fill-both">
-                            Kasir Modern untuk Bisnis Anda
+                            Kasir Modern untuk Bisnis Anda anjay
                         </p>
                         <p class="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mx-auto animate-fade-in animation-delay-600 animation-fill-both px-2">
                             Kelola bisnis Anda dengan sistem kasir yang cepat, mudah, dan terpercaya
