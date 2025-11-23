@@ -38,7 +38,7 @@ jobs:
 
       - name: Create deployment archive (FIXED TAR ERROR)
         run: |
-          tar --warning=no-file-changed --ignore-failed-read -czf deployment.tar.gz \
+          tar --warning=no-file-changed -czf deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
