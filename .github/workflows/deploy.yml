@@ -122,6 +122,10 @@ jobs:
             # Backup .env
             cp .env .env.backup 2>/dev/null || true
             
+            # IMPORTANT: Change ownership ke user dulu sebelum delete
+            echo "Changing ownership..."
+            sudo chown -R $USER:$USER $PROJECT_PATH
+            
             # Clean old files LEBIH AGRESIF (kecuali storage dan .env)
             echo "Cleaning old files..."
             rm -rf app/
@@ -150,9 +154,8 @@ jobs:
             
             # Fix permissions SEBELUM run artisan
             echo "Setting permissions..."
-            sudo chown -R $USER:www-data $PROJECT_PATH
-            sudo chmod -R 775 storage bootstrap/cache
-            sudo chmod 664 .env
+            chmod -R 775 storage bootstrap/cache
+            chmod 664 .env
             
             # Run artisan commands (sekarang user punya akses write)
             echo "Running migrations..."
@@ -175,6 +178,13 @@ jobs:
             php artisan route:cache
             php artisan view:cache
             php artisan optimize
+            
+            # Set ownership ke www-data SETELAH semua selesai
+            echo "Final ownership setup..."
+            sudo chown -R www-data:www-data $PROJECT_PATH
+            sudo chmod -R 775 storage bootstrap/cache
+            sudo chmod -R 755 $PROJECT_PATH
+            sudo chmod 644 $PROJECT_PATH/.env
             
             # Restart PHP-FPM untuk clear opcache
             echo "Restarting PHP-FPM..."
