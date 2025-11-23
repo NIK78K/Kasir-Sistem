@@ -38,7 +38,7 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          # 1. Buat arsip di folder /tmp agar tidak error 'file changed'
+          # 1. Buat arsip di folder /tmp (di luar folder project) agar tidak error 'file changed'
           tar -czf /tmp/deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
@@ -51,7 +51,7 @@ jobs:
             --exclude='storage/framework/views/*' \
             .
           
-          # 2. Pindahkan file dari /tmp ke folder kerja saat ini agar bisa di-upload
+          # 2. Pindahkan file yang sudah jadi kembali ke folder project untuk di-upload
           mv /tmp/deployment.tar.gz ./deployment.tar.gz
 
       - name: Deploy to VPS (Upload)
@@ -92,9 +92,6 @@ jobs:
             # 3. Atur Permission
             echo "wm Mengatur Izin Akses..."
             chmod -R 775 storage bootstrap/cache
-            
-            # Opsional: Jika user amkas6 punya akses sudo tanpa password
-            # sudo chown -R www-data:www-data $PROJECT_PATH
             
             # 4. Update Database & Laravel
             echo "🚀 Menjalankan Migrasi & Cache..."
