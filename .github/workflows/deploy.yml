@@ -150,13 +150,13 @@ jobs:
               rm -f .env.backup
             fi
             
-            # Fix permissions dengan sudo
+            # Fix permissions SEBELUM run artisan
             echo "Setting permissions..."
-            sudo chown -R www-data:www-data $PROJECT_PATH
+            sudo chown -R $USER:www-data $PROJECT_PATH
             sudo chmod -R 775 storage bootstrap/cache
-            sudo chmod 644 .env
+            sudo chmod 664 .env
             
-            # Run artisan commands
+            # Run artisan commands (sekarang user punya akses write)
             echo "Running migrations..."
             php artisan migrate --force
             
@@ -165,6 +165,11 @@ jobs:
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            
+            # Set ownership ke www-data setelah artisan selesai
+            echo "Final permission setup..."
+            sudo chown -R www-data:www-data $PROJECT_PATH
+            sudo chmod -R 775 storage bootstrap/cache
             
             echo "=================================================="
             echo "Deployment completed successfully!"
