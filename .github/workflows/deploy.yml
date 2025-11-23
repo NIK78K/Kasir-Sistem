@@ -1,4 +1,4 @@
-name: Deploy to Bizznet VPS
+name: Deploy to Biznet VPS
 
 on:
   push:
@@ -36,9 +36,9 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Create deployment archive
+      - name: Create deployment archive (FIXED TAR ERROR)
         run: |
-          tar -czf deployment.tar.gz \
+          tar --warning=no-file-changed --ignore-failed-read -czf deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
@@ -69,37 +69,34 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            # Tentukan path project
             PROJECT_PATH="/var/www/Kasir-Sistem"
             cd $PROJECT_PATH
             
-            # 1. Backup versi lama (Simpan di folder home user agar aman)
             timestamp=$(date +%Y%m%d_%H%M%S)
             BACKUP_DIR="$HOME/backups/kasir-sistem"
             mkdir -p $BACKUP_DIR
             
-            echo "📦 Membuat Backup ke $BACKUP_DIR..."
+            echo "📦 Membuat backup ke $BACKUP_DIR"
             tar -czf "$BACKUP_DIR/backup_$timestamp.tar.gz" . --exclude=node_modules 2>/dev/null || true
             
-            # 2. Ekstrak versi baru dari GitHub
-            echo "📂 Mengekstrak File Baru..."
+            echo "🧹 Menghapus file lama (kecuali storage & .env)"
+            find . -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' ! -name 'deployment.tar.gz' -exec rm -rf {} +
+            
+            echo "📂 Mengekstrak file baru"
             tar -xzf /tmp/deployment.tar.gz -C .
             rm /tmp/deployment.tar.gz
             
-            # 3. Atur Permission
-            echo "wm Mengatur Izin Akses..."
+            echo "🔧 Mengatur permission"
             chmod -R 775 storage bootstrap/cache
             
-            # 4. Update Database & Laravel
-            echo "🚀 Menjalankan Migrasi & Cache..."
+            echo "🚀 Migrasi & optimasi"
             php artisan migrate --force
-            
             php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            
-            echo "✅ Deployment Selesai! Versi $timestamp tersimpan."
+
+            echo "✅ Deployment Selesai! Versi $timestamp"
 
       - name: Notify deployment status
         if: always()
