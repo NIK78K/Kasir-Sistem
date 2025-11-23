@@ -38,21 +38,18 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          # 1. Buat arsip di folder /tmp (di luar folder project) agar tidak error 'file changed'
-          tar -czf /tmp/deployment.tar.gz \
+          tar -czf deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
             --exclude='tests' \
             --exclude='.env' \
+            --exclude='deployment.tar.gz' \
             --exclude='storage/logs/*' \
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
-            .
-          
-          # 2. Pindahkan file yang sudah jadi kembali ke folder project untuk di-upload
-          mv /tmp/deployment.tar.gz ./deployment.tar.gz
+            -C . .
 
       - name: Deploy to VPS (Upload)
         uses: appleboy/scp-action@master
