@@ -24,11 +24,16 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+        env:
+          COMPOSER_PROCESS_TIMEOUT: 0
+          COMPOSER_NO_INTERACTION: 1
+          COMPOSER_NO_AUDIT: 1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install NPM dependencies
         run: npm ci
@@ -36,26 +41,30 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Prepare build directory
+      - name: Create deployment archive
         run: |
-          mkdir build
-          rsync -av --exclude '.git' \
-                   --exclude '.github' \
-                   --exclude 'node_modules' \
-                   --exclude 'tests' \
-                   --exclude '.env' \
-                   --exclude 'storage/logs/*' \
-                   --exclude 'storage/framework/cache/*' \
-                   --exclude 'storage/framework/sessions/*' \
-                   --exclude 'storage/framework/views/*' \
-                   ./ ./build/
+          tar -czf deployment.tar.gz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            --exclude='storage/logs/*' \
+            --exclude='storage/framework/cache/*' \
+            --exclude='storage/framework/sessions/*' \
+            --exclude='storage/framework/views/*' \
+            --exclude='bootstrap/cache/*' \
+            --exclude='.gitignore' \
+            --exclude='.editorconfig' \
+            --exclude='phpunit.xml' \
+            --exclude='README.md' \
+            --warning=no-file-changed \
+            .
+          
+          echo "📦 Archive created: $(ls -lh deployment.tar.gz | awk '{print $5}')"
 
-      - name: Create deployment archive (NO MORE ERRORS)
-        run: |
-          cd build
-          tar -czf ../deployment.tar.gz .
-
-      - name: Deploy to VPS (Upload)
+      - name: Deploy to VPS
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -64,8 +73,113 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           source: "deployment.tar.gz"
           target: "/tmp/"
+          timeout: 10m
 
-      - name: Execute deployment script (SSH)
+      - name: Execute deployment script
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          timeout: 15m
+          script: |
+            set -e
+            
+            PROJECT_PATH="/var/www/Kasir-Sistem"
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            BACKUP_DIR="$HOME/backups/kasir-sistem"
+            
+            echo "=================================================="
+            echo "🚀 Starting Deployment - $TIMESTAMP"
+            echo "=================================================="
+            
+            # Validasi file deployment
+            if [ ! -f "/tmp/deployment.tar.gz" ]; then
+              echo "❌ Error: deployment.tar.gz tidak ditemukan!"
+              exit 1
+            fi
+            
+            cd $PROJECT_PATH
+            
+            # Backup
+            echo "📦 Creating backup..."
+            mkdir -p $BACKUP_DIR
+            tar -czf "$BACKUP_DIR/backup_$TIMESTAMP.tar.gz" \
+              --exclude='node_modules' \
+              --exclude='storage/logs/*' \
+              --exclude='storage/framework/cache/*' \
+              --exclude='storage/framework/sessions/*' \
+              --exclude='storage/framework/views/*' \
+              . 2>/dev/null || echo "⚠️ Backup completed with warnings"
+            
+            # Keep only last 5 backups
+            ls -t $BACKUP_DIR/backup_*.tar.gz | tail -n +6 | xargs -r rm
+            echo "✅ Backup created: backup_$TIMESTAMP.tar.gz"
+            
+            # Enable maintenance mode
+            echo "🔧 Enabling maintenance mode..."
+            php artisan down --retry=60 || echo "⚠️ App already in maintenance mode"
+            
+            # Backup .env
+            echo "💾 Backing up .env..."
+            cp .env .env.backup
+            
+            # Clean old files (except storage & .env)
+            echo "🧹 Cleaning old files..."
+            find . -mindepth 1 -maxdepth 1 \
+              ! -name 'storage' \
+              ! -name '.env' \
+              ! -name '.env.backup' \
+              -exec rm -rf {} + 2>/dev/null || true
+            
+            # Extract new files
+            echo "📂 Extracting new files..."
+            tar -xzf /tmp/deployment.tar.gz -C .
+            rm /tmp/deployment.tar.gz
+            
+            # Restore .env if not exists
+            if [ ! -f .env ]; then
+              echo "⚠️ Restoring .env from backup..."
+              mv .env.backup .env
+            else
+              rm -f .env.backup
+            fi
+            
+            # Set permissions
+            echo "🔐 Setting permissions..."
+            sudo chown -R www-data:www-data $PROJECT_PATH
+            sudo chmod -R 775 storage bootstrap/cache
+            sudo chmod 644 .env
+            
+            # Run migrations and optimizations
+            echo "🗄️ Running migrations..."
+            php artisan migrate --force
+            
+            echo "⚡ Optimizing application..."
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan event:cache
+            
+            # Restart services (optional - uncomment if needed)
+            # echo "🔄 Restarting services..."
+            # sudo systemctl restart php8.3-fpm
+            # sudo systemctl reload nginx
+            
+            # Disable maintenance mode
+            echo "✅ Disabling maintenance mode..."
+            php artisan up
+            
+            echo "=================================================="
+            echo "✅ Deployment completed successfully!"
+            echo "📅 Version: $TIMESTAMP"
+            echo "📦 Backup: $BACKUP_DIR/backup_$TIMESTAMP.tar.gz"
+            echo "=================================================="
+
+      - name: Health check
+        if: success()
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -73,41 +187,32 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            PROJECT_PATH="/var/www/Kasir-Sistem"
-            cd $PROJECT_PATH
+            cd /var/www/Kasir-Sistem
             
-            timestamp=$(date +%Y%m%d_%H%M%S)
-            BACKUP_DIR="$HOME/backups/kasir-sistem"
-            mkdir -p $BACKUP_DIR
-
-            echo "📦 Membuat backup ke $BACKUP_DIR"
-            tar -czf "$BACKUP_DIR/backup_$timestamp.tar.gz" . --exclude=node_modules || true
+            echo "🏥 Running health checks..."
             
-            echo "🧹 Menghapus file lama kecuali storage & .env"
-            find . -mindepth 1 -maxdepth 1 ! -name 'storage' ! -name '.env' -exec rm -rf {} +
+            # Check PHP version
+            php -v | head -n 1
             
-            echo "📂 Mengekstrak file baru"
-            tar -xzf /tmp/deployment.tar.gz -C .
-            rm /tmp/deployment.tar.gz
+            # Check Laravel version
+            php artisan --version
             
-            echo "🔧 Mengatur permission"
-            chmod -R 775 storage bootstrap/cache
+            # Check database connection
+            php artisan migrate:status | head -n 5
             
-            echo "🚀 Migrasi & optimasi"
-            php artisan migrate --force
-            php artisan optimize:clear
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-
-            echo "✅ Deployment Selesai! Versi $timestamp"
+            # Check disk space
+            df -h | grep -E '^/dev/'
+            
+            echo "✅ Health check completed!"
 
       - name: Notify deployment status
         if: always()
         run: |
           if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment successful!"
+            echo "✅ Deployment berhasil!"
+            echo "🌐 Aplikasi sudah live di production"
           else
-            echo "❌ Deployment failed!"
+            echo "❌ Deployment gagal!"
+            echo "🔍 Silakan cek logs untuk detail error"
             exit 1
           fi
