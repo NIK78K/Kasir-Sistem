@@ -68,5 +68,22 @@ chmod -R 755 bootstrap/cache
 echo "✅ Disabling maintenance mode..."
 php artisan up
 
+# Clear OPcache (so PHP doesn't keep serving old compiled files)
+echo "🧠 Clearing OPcache (if enabled)..."
+php -r "if(function_exists('opcache_reset')){ opcache_reset(); echo 'OPcache reset\n'; } else { echo 'No opcache present or function unavailable\n'; }"
+
+# Try restarting PHP-FPM so opcode cache and file changes are picked up
+echo "🔁 Restarting PHP-FPM (if service detected)..."
+if command -v systemctl >/dev/null 2>&1; then
+	for svc in php8.3-fpm php8.2-fpm php8.1-fpm php8.0-fpm php7.4-fpm php-fpm; do
+		if systemctl list-units --full -all | grep -q "${svc}.service"; then
+			echo "Restarting ${svc}..."
+			systemctl restart ${svc}.service 2>/dev/null || sudo systemctl restart ${svc}.service 2>/dev/null || true
+			echo "${svc} restarted (or attempted)."
+			break
+		fi
+	done
+fi
+
 echo "🎉 Deployment completed successfully!"
 echo "⏰ Deployed at: $(date)"
