@@ -206,13 +206,19 @@ jobs:
             echo "✅ Health check completed!"
 
       - name: Notify deployment status
-        if: always()
+        if: success()
         run: |
-          if [ "${{ job.status }}" == "success" ]; then
-            echo "✅ Deployment berhasil!"
-            echo "🌐 Aplikasi sudah live di production"
-          else
-            echo "❌ Deployment gagal!"
-            echo "🔍 Silakan cek logs untuk detail error"
-            exit 1
-          fi
+          echo "=================================================="
+          echo "✅ Deployment berhasil!"
+          echo "🌐 Aplikasi sudah live di production"
+          echo "📅 Deployed at: $(date '+%Y-%m-%d %H:%M:%S')"
+          echo "=================================================="
+      
+      - name: Notify deployment failure
+        if: failure()
+        run: |
+          echo "=================================================="
+          echo "❌ Deployment gagal!"
+          echo "🔍 Silakan cek logs untuk detail error"
+          echo "=================================================="
+          exit 1
