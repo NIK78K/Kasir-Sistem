@@ -160,11 +160,26 @@ jobs:
             echo "Running migrations..."
             php artisan migrate --force
             
-            echo "Optimizing..."
+            echo "Clearing all caches..."
+            php artisan cache:clear
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
             php artisan optimize:clear
+            
+            echo "Rebuilding caches..."
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
+            php artisan optimize
+            
+            # Restart PHP-FPM untuk clear opcache
+            echo "Restarting PHP-FPM..."
+            sudo systemctl restart php8.3-fpm || sudo systemctl restart php-fpm || true
+            
+            # Reload nginx
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx || true
             
             # Set ownership ke www-data setelah artisan selesai
             echo "Final permission setup..."
