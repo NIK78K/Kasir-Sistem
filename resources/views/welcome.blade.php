@@ -34,7 +34,7 @@
                             Kasir Modern untuk Bisnis Anda
                         </p>
                         <p class="text-xs sm:text-sm md:text-base text-slate-400 max-w-2xl mx-auto animate-fade-in animation-delay-600 animation-fill-both px-2">
-                            Kelola bisnis Anda dengan sistem kasir yang cepat, mudah, dan terpercaya
+                            kenapa nih? karena AMKAS itu singkatan dari Aplikasi Manajemen Kasir, jadi jelas banget kan fungsinya buat apa.
                         </p>
                     </div>
 
