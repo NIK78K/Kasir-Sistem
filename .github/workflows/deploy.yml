@@ -38,7 +38,7 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          tar -czf deployment.tar.gz \
+          tar -czf /tmp/deployment.tar.gz \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
@@ -49,6 +49,7 @@ jobs:
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
             .
+          mv /tmp/deployment.tar.gz ./deployment.tar.gz
 
       - name: Deploy to VPS
         uses: appleboy/scp-action@master
