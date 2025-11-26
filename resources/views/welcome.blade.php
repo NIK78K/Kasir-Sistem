@@ -26,7 +26,7 @@
                     <div class="text-center pt-8 pb-6 px-4 sm:pt-12 sm:pb-8 sm:px-6 lg:pt-16 lg:pb-10 lg:px-12">
                         <!-- Brand Name -->
                         <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 sm:mb-4 animate-fade-in animation-delay-200 animation-fill-both">
-                            TES
+                            AMKAS
                         </h1>
                         
                         <!-- Tagline -->
