@@ -54,6 +54,7 @@ jobs:
             --exclude='storage/framework/cache/*' \
             --exclude='storage/framework/sessions/*' \
             --exclude='storage/framework/views/*' \
+            --exclude='storage/app/public/*' \
             --exclude='bootstrap/cache/*' \
             --exclude='.gitignore' \
             --exclude='.editorconfig' \
@@ -126,6 +127,32 @@ jobs:
             # Backup .env
             cp .env .env.backup 2>/dev/null || true
             
+            # ========================================
+            # BACKUP UPLOADED FILES
+            # ========================================
+            echo "Backing up uploaded files..."
+            
+            # Backup storage/app/public (symlinked to public/storage)
+            if [ -d "storage/app/public" ]; then
+              mkdir -p /tmp/deployment_backup
+              cp -r storage/app/public /tmp/deployment_backup/storage_public
+              echo "✓ Backed up storage/app/public"
+            fi
+            
+            # Backup any other upload folders (sesuaikan dengan folder upload Anda)
+            if [ -d "public/uploads" ]; then
+              mkdir -p /tmp/deployment_backup
+              cp -r public/uploads /tmp/deployment_backup/public_uploads
+              echo "✓ Backed up public/uploads"
+            fi
+            
+            if [ -d "public/images" ]; then
+              mkdir -p /tmp/deployment_backup
+              cp -r public/images /tmp/deployment_backup/public_images
+              echo "✓ Backed up public/images"
+            fi
+            # ========================================
+            
             # Change ownership
             echo "Changing ownership..."
             sudo chown -R $USER:$USER $PROJECT_PATH
@@ -155,6 +182,41 @@ jobs:
             if [ -f .env.backup ]; then
               mv .env.backup .env
             fi
+            
+            # ========================================
+            # RESTORE UPLOADED FILES
+            # ========================================
+            echo "Restoring uploaded files..."
+            
+            # Restore storage/app/public
+            if [ -d "/tmp/deployment_backup/storage_public" ]; then
+              mkdir -p storage/app/public
+              cp -r /tmp/deployment_backup/storage_public/* storage/app/public/
+              echo "✓ Restored storage/app/public"
+            fi
+            
+            # Restore public/uploads
+            if [ -d "/tmp/deployment_backup/public_uploads" ]; then
+              mkdir -p public/uploads
+              cp -r /tmp/deployment_backup/public_uploads/* public/uploads/
+              echo "✓ Restored public/uploads"
+            fi
+            
+            # Restore public/images
+            if [ -d "/tmp/deployment_backup/public_images" ]; then
+              mkdir -p public/images
+              cp -r /tmp/deployment_backup/public_images/* public/images/
+              echo "✓ Restored public/images"
+            fi
+            
+            # Cleanup temporary backup
+            rm -rf /tmp/deployment_backup
+            echo "✓ Uploaded files restored successfully"
+            # ========================================
+            
+            # Recreate storage link if needed
+            echo "Recreating storage symlink..."
+            $PHP_BIN artisan storage:link || true
             
             # Fix permissions
             echo "Setting permissions..."
