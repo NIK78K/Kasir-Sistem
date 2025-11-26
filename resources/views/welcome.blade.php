@@ -45,7 +45,7 @@
                             <div class="group bg-slate-700/80 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border border-slate-600/50 hover:bg-slate-700/90 hover:border-slate-600/70 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-800/20 animate-fade-in-up animation-delay-800 animation-fill-both text-center min-h-[140px] sm:min-h-[160px] lg:min-h-[200px] flex flex-col items-center justify-center">
                                 <div class="text-4xl sm:text-5xl lg:text-6xl mb-2 sm:mb-3 lg:mb-4 transform group-hover:scale-110 transition-transform duration-300">📦</div>
                                 <h3 class="text-sm sm:text-base lg:text-lg font-bold text-white mb-1 sm:mb-2 leading-tight">Manajemen Barang</h3>
-                                <p class="text-xs lg:text-sm text-white/70 leading-relaxed">Kelola stok dan harga dengan mudah</p>
+                                <p class="text-xs lg:text-sm text-white/70 leading-relaxed">Kelola data stok dan harga dengan mudah</p>
                             </div>
 
                             <!-- Feature 2 -->
