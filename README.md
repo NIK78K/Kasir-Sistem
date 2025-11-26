@@ -22,17 +22,34 @@ anugrah mandiri.</p>
 ```bash
 git clone https://github.com/NIK78K/Kasir-Sistem.git
 cd Kasir-Sistem
+```
+2. Install dependency PHP:
 
-composer install
+```bash
+composer install:
+```
+3. Install dependency frontend:
 
+```bash
 npm install && npm run build
+```
+4. Copy file environment:
 
+```bash
 cp .env.example .env
+```
+5. Generate key dan migrate database:
 
+```bash
 php artisan key:generate
 php artisan migrate --seed
+```
 
+6. Jalankan server:
+
+```bash
 php artisan serve
+```
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
