@@ -100,7 +100,7 @@
                             href="{{ route('password.request') }}"
                             class="text-slate-800 hover:text-slate-700 font-semibold text-sm"
                         >
-                            Forgot your password?
+                            Lupa Password?
                         </a>
                     </div>
                 @endif
