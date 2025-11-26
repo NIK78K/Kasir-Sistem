@@ -91,8 +91,12 @@ jobs:
             TIMESTAMP=$(date +%Y%m%d_%H%M%S)
             BACKUP_DIR="$HOME/backups/kasir-sistem"
             
+            # PENTING: Set PHP version yang benar
+            PHP_BIN="/usr/bin/php8.3"
+            
             echo "=================================================="
             echo "Starting Deployment - $TIMESTAMP"
+            echo "Using PHP: $($PHP_BIN -v | head -n 1)"
             echo "=================================================="
             
             # Check deployment file
@@ -122,11 +126,11 @@ jobs:
             # Backup .env
             cp .env .env.backup 2>/dev/null || true
             
-            # IMPORTANT: Change ownership ke user dulu sebelum delete
+            # Change ownership
             echo "Changing ownership..."
             sudo chown -R $USER:$USER $PROJECT_PATH
             
-            # Clean old files LEBIH AGRESIF (kecuali storage dan .env)
+            # Clean old files
             echo "Cleaning old files..."
             rm -rf app/
             rm -rf bootstrap/
@@ -141,7 +145,7 @@ jobs:
             rm -f *.js
             rm -f *.md
             
-            # Extract new files dengan overwrite
+            # Extract new files
             echo "Extracting new files..."
             tar -xzf /tmp/deployment.tar.gz --overwrite -C .
             
@@ -152,21 +156,25 @@ jobs:
               mv .env.backup .env
             fi
             
-            # Fix permissions SEBELUM run artisan
+            # Fix permissions
             echo "Setting permissions..."
             chmod -R 775 storage bootstrap/cache
             chmod 664 .env
             
-            # Run artisan commands (sekarang user punya akses write)
-            echo "Running migrations..."
-            php artisan migrate --force
+            # Verify PHP and mbstring
+            echo "Verifying PHP extensions..."
+            $PHP_BIN -m | grep mbstring || echo "WARNING: mbstring not found!"
             
-            echo "Clearing all caches AGGRESSIVELY..."
-            php artisan cache:clear || true
-            php artisan config:clear || true
-            php artisan route:clear || true
-            php artisan view:clear || true
-            php artisan optimize:clear || true
+            # Run artisan commands dengan PHP 8.3
+            echo "Running migrations..."
+            $PHP_BIN artisan migrate --force
+            
+            echo "Clearing all caches..."
+            $PHP_BIN artisan cache:clear || true
+            $PHP_BIN artisan config:clear || true
+            $PHP_BIN artisan route:clear || true
+            $PHP_BIN artisan view:clear || true
+            $PHP_BIN artisan optimize:clear || true
             
             # Hapus cache files manually
             rm -rf storage/framework/cache/data/* || true
@@ -174,19 +182,19 @@ jobs:
             rm -rf bootstrap/cache/*.php || true
             
             echo "Rebuilding caches..."
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize
+            $PHP_BIN artisan config:cache
+            $PHP_BIN artisan route:cache
+            $PHP_BIN artisan view:cache
+            $PHP_BIN artisan optimize
             
-            # Set ownership ke www-data SETELAH semua selesai
+            # Set ownership ke www-data
             echo "Final ownership setup..."
             sudo chown -R www-data:www-data $PROJECT_PATH
             sudo chmod -R 775 storage bootstrap/cache
             sudo chmod -R 755 $PROJECT_PATH
             sudo chmod 644 $PROJECT_PATH/.env
             
-            # Restart PHP-FPM untuk clear opcache
+            # Restart PHP-FPM
             echo "Restarting PHP-FPM..."
             sudo systemctl restart php8.3-fpm || sudo systemctl restart php-fpm || true
             
@@ -198,11 +206,6 @@ jobs:
             echo "Verifying files..."
             ls -lh public/index.php
             head -5 routes/web.php
-            
-            # Set ownership ke www-data setelah artisan selesai
-            echo "Final permission setup..."
-            sudo chown -R www-data:www-data $PROJECT_PATH
-            sudo chmod -R 775 storage bootstrap/cache
             
             echo "=================================================="
             echo "Deployment completed successfully!"
