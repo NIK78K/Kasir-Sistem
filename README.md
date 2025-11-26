@@ -14,6 +14,7 @@ anugrah mandiri.</p>
 - Adanya Fitur laporan penjualan yang bisa di export ke Excel
 - Fitur laporan riwayat barang return 
 - Panel menu dashboard terdapat informasi data setiap menu tergantung role dan grafik       penjualan dan barang return
+- Dilengkapi dengan CI/CD GitHub Actions untuk otomatisasi deploy ke VPS setiap ada perubahan pada branch main
 
 ## Instalasi Lokal
 
@@ -50,6 +51,10 @@ php artisan migrate --seed
 ```bash
 php artisan serve
 ```
+
+## Continuous Integration/Continuous Deployment/Delivery(CI/CD)
+Project ini sudah menggunakan GitHub Actions untuk otomatisasi build & deploy ke VPS.
+Kamu cukup melakukan push ke branch main, dan sistem akan men-deploy versi terbaru secara otomatis.
 
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
