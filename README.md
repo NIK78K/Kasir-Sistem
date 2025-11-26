@@ -1,5 +1,3 @@
-Toko Sepeda Anugrah Mandiri merupakan
-sebuat Usaha Mikro Kecil dan Menengah yang bergerak di bidang jual beli sepeda,dimana toko ini mengalami kesulitan dalam menangani data transaksi secaraefektif, dikarenakan pendataan transaksi yang masih dilakukan secara manual menggunakan buku. Untuk menjawab kebutuhan tersebut, dikembangkanlah Sistem Kasir AMKAS (Anugrah Mandiri Kasir) sebagai solusi digital untuk membantu proses transaksi penjualan dan ineventaris sederhana pada toko sepeda anugrah mandiri
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
