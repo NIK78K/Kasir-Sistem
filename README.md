@@ -1,3 +1,39 @@
+<h1 align="center">AMKAS - Anugrah Mandiri Kasir</h1>
+<p align="center">Toko Sepeda Anugrah Mandiri merupakan
+sebuat Usaha Mikro Kecil dan Menengah yang bergerak di bidang jual beli sepeda,
+dimana toko ini mengalami kesulitan dalam menangani data transaksi secara
+efektif, dikarenakan pendataan transaksi yang masih dilakukan secara manual
+menggunakan buku. Untuk menjawab kebutuhan tersebut, dikembangkanlah
+Sistem Kasir AMKAS (Anugrah Mandiri Kasir) sebagai solusi digital untuk
+membantu proses transaksi penjualan dan ineventaris sederhana pada toko sepeda
+anugrah mandiri.</p>
+
+## ✨ Fitur Utama
+- Proses Pembelian barang melalui Sistem Transaksi
+- Pengelolaan data barang berupa nama barang,harga retail,harga grosir dan stok
+- Adanya Fitur laporan penjualan yang bisa di export ke Excel
+- Fitur laporan riwayat barang return 
+- Panel menu dashboard terdapat informasi data setiap menu tergantung role dan grafik       penjualan dan barang return
+
+## Instalasi Lokal
+
+1. Clone repository:
+
+```bash
+git clone https://github.com/Ahm-dev-sketch/Sipemtraa.git
+cd Sipemtraa
+
+composer install
+
+npm install && npm run build
+
+cp .env.example .env
+
+php artisan key:generate
+php artisan migrate --seed
+
+php artisan serve
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
