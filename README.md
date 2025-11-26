@@ -20,8 +20,8 @@ anugrah mandiri.</p>
 1. Clone repository:
 
 ```bash
-git clone https://github.com/Ahm-dev-sketch/Sipemtraa.git
-cd Sipemtraa
+git clone https://github.com/NIK78K/Kasir-Sistem.git
+cd Kasir-Sistem
 
 composer install
 
